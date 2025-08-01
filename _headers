@@ -1,5 +1,8 @@
 /index.xml
   Content-Type: application/rss+xml
 
-/index.cms
-  Content-Type: application/rss+xml
+[[headers]]
+  for = "/index.cms"
+  [headers.values]
+    Content-Type = "application/rss+xml"
+
