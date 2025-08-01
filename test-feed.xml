@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<rss version="2.0">
+<channel>
+    <title>Test Feed</title>
+    <link>https://kidgiland.org</link>
+    <description>Your feed description</description>
+    
+    <item>
+        <title>Trump tariff assault hits over 40 Indian stocks. Full list across key sectors for stock market investors</title>
+        <description>Indian markets initially stumbled but recovered following Trump's tariff announcement, with export-heavy sectors like textiles, pharma, and auto facing the brunt. While some companies anticipate minimal impact, others, particularly in textiles and solar, brace for significant challenges. Pharma faces complex tariff equations, while IT anticipates indirect effects. Refiners may need to diversify sourcing, and the metal sector awaits clarity.</description>
+        <link>https://economictimes.indiatimes.com/markets/stocks/news/trump-tariff-assault-hits-over-40-indian-stocks-full-list-across-key-sectors-for-stock-market-investors/articleshow/123014936.cms?from=mdr</link>
+        <pubDate>2025-08-01 00:00:00</pubDate>
+    </item>
+    
+    <item>
+        <title>Nifty 50, Sensex today: What to expect from Indian stock market in trade on August 1 after Trump’s tariffs</title>
+        <description>Nifty 50, Sensex today: The trends on Gift Nifty also indicate a gap-down start for the Indian benchmark index. The Gift Nifty was trading around 24,729 level, a discount of nearly 143 points from the Nifty futures’ previous close.</description>
+        <link>https://www.livemint.com/market/stock-market-news/nifty-50-sensex-today-what-to-expect-from-indian-stock-market-in-trade-on-august-1-after-trump-s-tariffs-11754013161333.html</link>
+        <pubDate>2025-08-01 00:00:00</pubDate>
+    </item>
+    
+    <item>
+        <title>Adani Power announces its first-ever stock split: What it means for shareholders?</title>
+        <description>Adani Power announces its first-ever stock split in the ratio of 1:5.</description>
+        <link>https://www.moneycontrol.com/news/photos/business/markets/adani-power-announces-its-first-ever-stock-split-what-it-means-for-shareholders-13367451.html</link>
+        <pubDate>2025-08-01 00:00:00</pubDate>
+    </item>
+    
+</channel>
+</rss>
