@@ -1,2 +1,5 @@
-feedparser
-lxml
+requests
+feedgen
+ratelimit
+bsedata
+pandas
