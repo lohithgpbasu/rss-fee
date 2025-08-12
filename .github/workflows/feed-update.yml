@@ -1,0 +1,32 @@
+name: Update RSS Feed
+
+on:
+  schedule:
+    - cron: "0 */2 * * *"  # every 2 hours
+  workflow_dispatch: # allow manual run
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.x"
+
+      - name: Install dependencies
+        run: pip install feedparser lxml
+
+      - name: Run feed generator
+        run: python generate_feed.py  # <-- your script that creates feed.xml
+
+      - name: Commit changes
+        run: |
+          git config --local user.name "github-actions[bot]"
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git add feed.xml
+          git commit -m "Auto-update feed.xml" || echo "No changes"
+          git push
