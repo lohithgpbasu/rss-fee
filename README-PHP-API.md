@@ -4,9 +4,9 @@ This project provides a PHP backend with two API endpoints designed to be used b
 ## Project Architecture
 The project consists of two main PHP scripts that function as API endpoints:
 
-- 1. `get_layouts.php`: A simple API to fetch a list of layouts that a specific dealer is authorized to use.
+1. `get_layouts.php`: A simple API to fetch a list of layouts that a specific dealer is authorized to use.
 
-- 2. `automate.php`: The core automation API that receives display and layout information, then uses Selenium to perform the update on the server.
+2. `automate.php`: The core automation API that receives display and layout information, then uses Selenium to perform the update on the server.
 
 The project is self-contained; all layout and dealership data is embedded within `get_layouts.php`, removing the need for external data files.
 
