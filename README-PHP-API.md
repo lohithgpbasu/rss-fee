@@ -13,12 +13,12 @@ The project is self-contained; all layout and dealership data is embedded within
 ## API Endpoint Documentation
 Here is the detailed documentation for the two API endpoints that your mobile application will need to call.
 
-- 1. Get Shared Layouts
+1. Get Shared Layouts
 This endpoint provides a list of layout names that are shared with a specific dealership.
 
-URL: `https://yourdomain.com/User-Request/get_layouts.php`
+2. URL: `https://yourdomain.com/User-Request/get_layouts.php`
 
-Method: `GET`
+3. Method: `GET`
 
 # Query Parameters:
 
@@ -31,12 +31,12 @@ A JSON array of strings, where each string is a layout name. The list will be al
 Example Request (from mobile app):
 `GET https://yourdomain.com/User-Request/get_layouts.php?dealershipCode=a012031`
 
-- 2. Assign Layout
+1. Assign Layout
 This is the main endpoint that triggers the Selenium automation to update a display's layout.
 
-URL: `https://yourdomain.com/User-Request/automate.php`
+2. URL: `https://yourdomain.com/User-Request/automate.php`
 
-Method: `POST`
+3. Method: `POST`
 
 # Body Parameters (`multipart/form-data`):
 
@@ -67,7 +67,7 @@ ssh your_username@your_server_ip
 # Step 2: Install Dependencies
 Your project relies on PHP libraries (from Composer) and server software (Chrome).
 
-- 1. Install Composer:
+1. Install Composer:
 
 ```
 # Update your server's package list
@@ -77,11 +77,11 @@ sudo apt update
 sudo apt install composer git unzip
 ```
 
-- 2. Upload Your Project:
+2. Upload Your Project:
 
 Upload your `User-Request` folder (containing `automate.php`, `get_layouts.php`, and `composer.json`) to your server's web root (e.g., `/var/www/html/`). You can use an FTP client like FileZilla or your hosting provider's File Manager.
 
-- 3. Install PHP Libraries:
+3. Install PHP Libraries:
 
 Navigate to your project directory in the terminal and run Composer.
 
@@ -108,13 +108,13 @@ sudo apt-get install -f -y
 
 # Step 4: Install and Run ChromeDriver on the Server
 
-- 1. Check Your Chrome Version: You must download a ChromeDriver that exactly matches the version of Chrome you just installed.
+1. Check Your Chrome Version: You must download a ChromeDriver that exactly matches the version of Chrome you just installed.
 
 ```
 google-chrome --version
 ```
 
-- 2. Download the Correct ChromeDriver:
+2. Download the Correct ChromeDriver:
 
 - Go to the Chrome for Testing availability dashboard using this link: `https://googlechromelabs.github.io/chrome-for-testing/`.
 
@@ -128,7 +128,7 @@ google-chrome --version
 # Example for Chrome 128 - REPLACE THIS URL with the one you copied
 wget [https://storage.googleapis.com/chrome-for-testing-public/128.0.6613.84/linux64/chromedriver-linux64.zip](https://storage.googleapis.com/chrome-for-testing-public/128.0.6613.84/linux64/chromedriver-linux64.zip)
 ```
-- 3. Unzip and Prepare the Driver:
+3. Unzip and Prepare the Driver:
 
 ```
 # Unzip the file
@@ -140,7 +140,7 @@ cd chromedriver-linux64/
 # Make the driver executable
 chmod +x chromedriver
 ```
-- 4. Run ChromeDriver as a Background Service:
+4. Run ChromeDriver as a Background Service:
 For the API to work, ChromeDriver must be running constantly. We'll use a tool called `screen` to keep it running in the background.
 
 ```
