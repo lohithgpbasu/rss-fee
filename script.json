@@ -5,7 +5,7 @@
       "next_step": "verify_branch"
     },
     "verify_branch": {
-      "dialogue": "Thank You ${person_name}, this is ${branch_name}, right? Is the screen for your branch delivered or not?",
+      "dialogue": "Thank You ${person_name}, this is ${branch_name}, right? Is the screen for your branch delivered or not? Please say Yes or No.",
       "response_options": {
         "Yes": {
           "next_step": "check_site_ready"
@@ -17,7 +17,7 @@
       }
     },
     "check_site_ready": {
-      "dialogue": "Is your site ready for installation?",
+      "dialogue": "Is your site ready for installation? Please say Yes or No.",
       "response_options": {
         "Yes": {
           "next_step": "check_activation_done"
@@ -29,7 +29,7 @@
       }
     },
     "check_activation_done": {
-      "dialogue": "Activation of the screens done?",
+      "dialogue": "Activation of the screens done? Please say Yes or No.",
       "response_options": {
         "Yes": {
           "next_step": "check_installation_done"
@@ -41,7 +41,7 @@
       }
     },
     "check_installation_done": {
-      "dialogue": "Installation of screens done?",
+      "dialogue": "Installation of screens done? Please say Yes or No.",
       "response_options": {
         "Yes": {
           "next_step": "check_plug_points"
@@ -53,19 +53,19 @@
       }
     },
     "check_plug_points": {
-      "dialogue": "Did you arrange two plug points for the TV and Router? Also, make sure the TV is not installed under the AC, and the wall is solid enough to hold the TV after mounting.",
+      "dialogue": "Did you arrange two plug points for the TV and Router? Please say Yes or No.",
       "response_options": {
         "Yes": {
           "next_step": "check_internet_connection"
         },
         "No": {
-          "dialogue": "Please ensure all setup requirements are met before proceeding.",
+          "dialogue": "Please ensure all setup requirements are met before proceeding. Also, make sure the TV is not installed under the AC, and the wall is solid enough to hold the TV after mounting.",
           "next_step": "end_call"
         }
       }
     },
     "check_internet_connection": {
-      "dialogue": "Are the screens connected to the Internet?",
+      "dialogue": "Are the screens connected to the Internet? Please say Yes or No.",
       "response_options": {
         "Yes": {
           "next_step": "check_tv_ads"
@@ -77,7 +77,7 @@
       }
     },
     "check_tv_ads": {
-      "dialogue": "Are TV ads playing on the screens?",
+      "dialogue": "Are TV ads playing on the screens? Please say Yes or No.",
       "response_options": {
         "Yes": {
           "dialogue": "Thank You for your responses! Have a nice day.",
@@ -95,3 +95,4 @@
     }
   }
 }
+
