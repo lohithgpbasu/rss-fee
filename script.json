@@ -5,7 +5,7 @@
       "next_step": "verify_branch"
     },
     "verify_branch": {
-      "dialogue": "Thank You. Is the screen for your branch delivered or not?",
+      "dialogue": "Thank You ${person_name}, this is ${branch_name}, right? Is the screen for your branch delivered or not?",
       "response_options": {
         "Yes": {
           "next_step": "check_site_ready"
@@ -95,5 +95,3 @@
     }
   }
 }
-
-
