@@ -1,0 +1,97 @@
+{
+  "call_flow": {
+    "call_start": {
+      "greeting": "${Greeting_Based_on_Time}, We are calling on behalf of PNB (Punjab National Bank). Can you please help me by answering the questions I ask about the digital Notice Board in your Bank?",
+      "next_step": "verify_branch"
+    },
+    "verify_branch": {
+      "dialogue": "Thank You ${person_name}, this is ${branch_name}, right? Is the screen for your branch delivered or not?",
+      "response_options": {
+        "Yes": {
+          "next_step": "check_site_ready"
+        },
+        "No": {
+          "dialogue": "Okay, we will call you back soon. Thank You for your time.",
+          "next_step": "end_call"
+        }
+      }
+    },
+    "check_site_ready": {
+      "dialogue": "Is your site ready for installation?",
+      "response_options": {
+        "Yes": {
+          "next_step": "check_activation_done"
+        },
+        "No": {
+          "dialogue": "Please make sure that the site is ready. Once confirmed, call back to this number.",
+          "next_step": "end_call"
+        }
+      }
+    },
+    "check_activation_done": {
+      "dialogue": "Activation of the screens done?",
+      "response_options": {
+        "Yes": {
+          "next_step": "check_installation_done"
+        },
+        "No": {
+          "dialogue": "Thank you for your response, we will send the TV to your Branch and make sure it's delivered.",
+          "next_step": "end_call"
+        }
+      }
+    },
+    "check_installation_done": {
+      "dialogue": "Installation of screens done?",
+      "response_options": {
+        "Yes": {
+          "next_step": "check_plug_points"
+        },
+        "No": {
+          "dialogue": "Please make sure the site is ready for installation.",
+          "next_step": "end_call"
+        }
+      }
+    },
+    "check_plug_points": {
+      "dialogue": "Did you arrange two plug points for the TV and Router? Also, make sure the TV is not installed under the AC, and the wall is solid enough to hold the TV after mounting.",
+      "response_options": {
+        "Yes": {
+          "next_step": "check_internet_connection"
+        },
+        "No": {
+          "dialogue": "Please ensure all setup requirements are met before proceeding.",
+          "next_step": "end_call"
+        }
+      }
+    },
+    "check_internet_connection": {
+      "dialogue": "Are the screens connected to the Internet?",
+      "response_options": {
+        "Yes": {
+          "next_step": "check_tv_ads"
+        },
+        "No": {
+          "dialogue": "Please connect to the Internet.",
+          "next_step": "end_call"
+        }
+      }
+    },
+    "check_tv_ads": {
+      "dialogue": "Are TV ads playing on the screens?",
+      "response_options": {
+        "Yes": {
+          "dialogue": "Thank You for your responses! Have a nice day.",
+          "next_step": "end_call"
+        },
+        "No": {
+          "dialogue": "Please wait, I will forward the call to the Activation Team.",
+          "next_step": "end_call"
+        }
+      }
+    },
+    "end_call": {
+      "dialogue": "Thank You for your responses. Have a Nice Day!",
+      "action": "End Call"
+    }
+  }
+}
