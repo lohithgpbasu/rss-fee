@@ -1,7 +1,7 @@
 {
   "call_flow": {
     "call_start": {
-      "greeting": "${Greeting_Based_on_Time}, We are calling on behalf of PNB (Punjab National Bank). Is this the right time to speak with you? Can you please help me by answering the questions I ask about the digital Notice Board in your Bank?",
+      "greeting": "Hello, We are calling on behalf of PNB (Punjab National Bank). Is this the right time to speak with you? Can you please help me by answering the questions I ask about the digital Notice Board in your Bank? This call will be recorded for quality purposes and for Analysing the Conversation, please co-perate..!",
       "next_step": "verify_branch"
     },
     "verify_branch": {
@@ -95,5 +95,6 @@
     }
   }
 }
+
 
 
