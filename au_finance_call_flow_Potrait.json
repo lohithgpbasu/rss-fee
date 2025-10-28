@@ -1,0 +1,64 @@
+{
+  "call_flow": {
+    "call_start": {
+      "greeting": "Hello, we are calling on behalf of AU-Finance. Can you please go to the portrait screen? It is showing offline in our server, and the new content needs to get updated. Please take the TV remote and follow the instructions I'll give to you now.",
+      "next_step": "check_portrait_screen"
+    },
+    "check_portrait_screen": {
+      "dialogue": "Can you please check if the portrait screen is working?",
+      "response_options": {
+        "Yes": {
+          "next_step": "check_network_connection"
+        },
+        "No": {
+          "dialogue": "No problem, we will reach you again when you are comfortable to talk and support us.",
+          "next_step": "end_call"
+        }
+      }
+    },
+    "check_network_connection": {
+      "dialogue": "Is the network connected? Please say Yes or No.",
+      "response_options": {
+        "Yes": {
+          "next_step": "check_time_date"
+        },
+        "No": {
+          "dialogue": "Please follow these steps to check your network connection:\nStep-1: Take the remote and press the Home button.\nStep-2: Press the Settings button on the remote.\nStep-3: Go to General Settings.\nStep-4: Click on Network.\nStep-5: Choose 'Wired connection'. Below, there will be an 'Edit' option. Click on it and press OK.\nStep-6: Check if the IP address, Gateway, DNS, and Subnet are filled.\nOnce done, please confirm.",
+          "next_step": "check_time_date"
+        }
+      }
+    },
+    "check_time_date": {
+      "dialogue": "Please check the time and date. Is it correct?",
+      "response_options": {
+        "Yes": {
+          "next_step": "check_landscape_screen"
+        },
+        "No": {
+          "dialogue": "Please follow these steps to set the time and date:\nStep-1: Press the Settings button on the remote.\nStep-2: Go to Time and Date.\nStep-3: If 'Set Automatically' is ON, turn it OFF.\nStep-4: In Continent, select Asia.\nStep-5: In Country, select India.\nStep-6: In City, select Kolkata.\nThen click on the Home button and check if the time and date are correct.",
+          "next_step": "check_landscape_screen"
+        }
+      }
+    },
+    "check_landscape_screen": {
+      "dialogue": "Now, please go to the landscape TV and follow the same process: check the network connection, time, and date, and then press the yellow button. Is everything working fine?",
+      "response_options": {
+        "Yes": {
+          "dialogue": "That's it! Thank you for your support.",
+          "next_step": "end_call"
+        },
+        "No": {
+          "next_step": "contact_it_manager"
+        }
+      }
+    },
+    "contact_it_manager": {
+      "dialogue": "Okay, please contact your IT Manager (Rajesh Kumar) regarding this network issue. We will email you his details. Thank you for your support.",
+      "next_step": "end_call"
+    },
+    "end_call": {
+      "dialogue": "Thank you for your time and support. Have a great day!",
+      "action": "End Call"
+    }
+  }
+}
