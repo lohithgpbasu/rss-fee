@@ -2,8 +2,7 @@
   "customApps": [
     {
       "name": "Mahindra Electric",
-      "path": "https://trinitystorageprod.blob.core.windows.net/trinityassets/75_inch/index.html",
-      "timeout": 500
+      "path": "https://trinitystorageprod.blob.core.windows.net/trinityassets/75_inch/index.html"
     }
   ]
 }
