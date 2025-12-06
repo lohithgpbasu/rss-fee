@@ -2,7 +2,7 @@
   "customApps": [
     {
       "name": "Mahindra BEV",
-      "path": "https://trinitystorageprod.blob.core.windows.net/trinityassets/75_inch/index.html"
+      "url": "https://trinitystorageprod.blob.core.windows.net/trinityassets/75_inch/index.html"
     }
   ]
 }
