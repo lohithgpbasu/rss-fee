@@ -3,6 +3,10 @@
     {
       "name": "Mahindra BEV",
       "url": "https://trinitystorageprod.blob.core.windows.net/trinityassets/75_inch/index.html"
+    },
+    {
+      "name": "Notepad (Dynamic Path)",
+      "url": "%SystemRoot%\\system32\\notepad.exe"
     }
   ]
 }
