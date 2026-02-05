@@ -1,0 +1,9 @@
+{
+  "customApps": [
+    {
+      "name": "ChargeIn",
+      "url": "https://www.chargein.com/kiosk",
+      "hotkey": ""
+    }
+  ]
+}
