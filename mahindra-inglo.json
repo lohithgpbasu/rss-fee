@@ -4,6 +4,11 @@
       "name": "INGLO",
       "url": "https://auto.mahindra.com/",
       "hotkey": ""
+    },
+    {
+      "name": "ChargeIn",
+      "url": "https://ngage.mahindracms.com/login/",
+      "hotkey": ""
     }
   ]
 }
