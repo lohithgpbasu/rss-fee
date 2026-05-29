@@ -279,6 +279,9 @@ Requirements:
 9. Recent 5 call records are displayed
 10. User closes modal
 
+
+# UI Prototype
+
 ```HTML
 
 <!DOCTYPE html>
@@ -527,6 +530,333 @@ Requirements:
             }
         }
 
+    </script>
+</body>
+</html>
+
+```
+
+# OR
+
+```HTML
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Call Logs Custom Tag Prototype</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        .call-logs-container {
+            padding: 20px;
+            border: 1px solid #ccc;
+            margin: 20px;
+            border-radius: 5px;
+        }
+
+        .call-logs-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .call-logs-title {
+            margin: 0;
+        }
+
+        .call-logs-button {
+            align-self: flex-end;
+        }
+
+        .call-logs-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .call-logs-table th, .call-logs-table td {
+            border: 1px solid #ccc;
+            padding: 10px;
+            text-align: center;
+        }
+
+        .call-history-modal {
+            display: none; /* Hidden by default */
+            position: fixed; /* Stay in place */
+            z-index: 1; /* Sit on top */
+            left: 0;
+            top: 0;
+            width: 100%; /* Full width */
+            height: 100%; /* Full height */
+            overflow: auto; /* Enable scroll if needed */
+            background-color: rgb(0,0,0); /* Fallback color */
+            background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+        }
+
+        /* Modal Content/Box */
+        .modal-content {
+            background-color: #fefefe;
+            margin: 15% auto; /* 15% from the top and centered */
+            padding: 20px;
+            border: 1px solid #888;
+            width: 80%; /* Could be more or less, depending on screen size */
+        }
+
+        .call-history-header {
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .call-history-title {
+            margin: 0;
+        }
+
+        .call-history-close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+        }
+
+        .call-history-close:hover,
+        .call-history-close:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        .call-history-body {
+            max-height: 300px;
+            overflow-y: auto;
+            align-self: flex-end;
+        }
+
+    </style>
+</head>
+<body>
+    <call-logs display-id="123" display-name="Test Tv AIPL"></call-logs>
+    <script>
+        // This is a prototype for a custom tag called <call-logs></call-logs>
+        class CallLogs extends HTMLElement {
+            connectedCallback() {
+    
+                const displayId = this.getAttribute('display-id');
+    
+                const displayName = this.getAttribute('display-name');
+    
+                const callLogsData = [
+                    {
+                        callerName: 'John Doe',
+                        callerNumber: '123-456-7890',
+                        issueType: 'Network Issue',
+                        network: 'Wi-Fi (Wireless Router)',
+                        description: 'Internet not working',
+                        dateTime: '2024-06-01 10:00 AM'
+                    },
+                    {
+                        callerName: 'Jane Smith',
+                        callerNumber: '987-654-3210',
+                        issueType: 'Billing Issue',
+                        network: 'Ethernet (Wired)',
+                        description: 'Incorrect bill amount',
+                        dateTime: '2024-06-02 02:30 PM'
+                    }
+                ];
+    
+                this.innerHTML = `
+                    <style>
+                        .call-logs-container {
+                            padding: 20px;
+                            border: 1px solid #ccc;
+                            margin: 20px;
+                            border-radius: 5px;
+                            font-family: Arial, sans-serif;
+                        }
+    
+                        .call-logs-header {
+                            display: flex;
+                            justify-content: space-between;
+                            align-items: center;
+                            margin-bottom: 20px;
+                        }
+    
+                        .call-logs-title {
+                            margin: 0;
+                        }
+    
+                        .call-logs-table {
+                            width: 100%;
+                            border-collapse: collapse;
+                        }
+    
+                        .call-logs-table th,
+                        .call-logs-table td {
+                            border: 1px solid #ccc;
+                            padding: 10px;
+                            text-align: center;
+                        }
+    
+                        .call-history-container {
+                            margin-top: 20px;
+                            border: 1px solid #ccc;
+                            border-radius: 5px;
+                            padding: 15px;
+                            display: none;
+                        }
+    
+                        .call-history-header {
+                            margin-bottom: 15px;
+                        }
+    
+                        .call-history-body {
+                            max-height: 300px;
+                            overflow-y: auto;
+                        }
+    
+                        input,
+                        select,
+                        textarea {
+                            width: 100%;
+                            box-sizing: border-box;
+                        }
+    
+                        textarea {
+                            resize: vertical;
+                        }
+                    </style>
+    
+                    <div class="call-logs-container">
+    
+                        <div class="call-logs-header">
+                            <h3 class="call-logs-title">${displayName}</h3>
+    
+                            <button class="call-logs-button">
+                                Call History
+                            </button>
+                        </div>
+    
+                        <!-- Form Table -->
+                        <div>
+                            <table class="call-logs-table">
+                                <thead>
+                                    <tr>
+                                        <th>Caller Name</th>
+                                        <th>Caller Number</th>
+                                        <th>Issue Type</th>
+                                        <th>Network</th>
+                                        <th>Description</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+    
+                                <tbody class="call-logs-body">
+                                    <tr>
+                                        <td>
+                                            <input type="text" placeholder="Caller Name"/>
+                                        </td>
+    
+                                        <td>
+                                            <input type="text" placeholder="Caller Number"/>
+                                        </td>
+    
+                                        <td>
+                                            <select>
+                                                <option>Network Issue</option>
+                                                <option>Billing Issue</option>
+                                                <option>Technical Support</option>
+                                            </select>
+                                        </td>
+    
+                                        <td>
+                                            <select>
+                                                <option>Dongle</option>
+                                                <option>Ethernet (Wired)</option>
+                                                <option>Wi-Fi (Wireless Router)</option>
+                                                <option>Others</option>
+                                            </select>
+                                        </td>
+    
+                                        <td>
+                                            <textarea placeholder="Description"></textarea>
+                                        </td>
+    
+                                        <td>
+                                            <button>Save</button>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+    
+                        <!-- Call History Section -->
+                        <div class="call-history-container">
+    
+                            <div class="call-history-header">
+                                <h3 class="call-history-title">
+                                    Call History
+                                    <span style="font-size: 14px; color: #666;">
+                                        (Recent 5 Calls)
+                                    </span>
+                                </h3>
+                            </div>
+    
+                            <div class="call-history-body">
+                                <table class="call-logs-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Caller Name</th>
+                                            <th>Caller Number</th>
+                                            <th>Issue Type</th>
+                                            <th>Network</th>
+                                            <th>Description</th>
+                                            <th>Date & Time</th>
+                                        </tr>
+                                    </thead>
+    
+                                    <tbody>
+                                        ${callLogsData.map(log => `
+                                            <tr>
+                                                <td>${log.callerName}</td>
+                                                <td>${log.callerNumber}</td>
+                                                <td>${log.issueType}</td>
+                                                <td>${log.network}</td>
+                                                <td>${log.description}</td>
+                                                <td>${log.dateTime}</td>
+                                            </tr>
+                                        `).join('')}
+                                    </tbody>
+                                </table>
+                            </div>
+    
+                        </div>
+                    </div>
+                `;
+    
+                // Toggle Call History
+                const historyBtn = this.querySelector('.call-logs-button');
+                const historyContainer = this.querySelector('.call-history-container');
+    
+                historyBtn.addEventListener('click', () => {
+    
+                    const isVisible =
+                        historyContainer.style.display === 'block';
+    
+                    historyContainer.style.display =
+                        isVisible ? 'none' : 'block';
+                });
+            }
+        }
+    
+        customElements.define('call-logs', CallLogs);
     </script>
 </body>
 </html>
