@@ -291,6 +291,7 @@ POST `/api/issue-types/add`
                         callerName: 'John Doe',
                         callerNumber: '123-456-7890',
                         issueType: 'Network Issue',
+                        network: 'Wi-Fi (Wireless Router)',
                         description: 'Internet not working',
                         dateTime: '2024-06-01 10:00 AM'
                     },
@@ -298,6 +299,7 @@ POST `/api/issue-types/add`
                         callerName: 'Jane Smith',
                         callerNumber: '987-654-3210',
                         issueType: 'Billing Issue',
+                        network: 'Ethernet (Wired)',
                         description: 'Incorrect bill amount',
                         dateTime: '2024-06-02 02:30 PM'
                     }
@@ -316,6 +318,7 @@ POST `/api/issue-types/add`
                                         <th>Caller Name</th>
                                         <th>Caller Number</th>
                                         <th>Issue Type</th>
+                                        <th>Network</th>
                                         <th>Description</th>
                                         <th>Actions</th>
                                     </tr>
@@ -329,6 +332,14 @@ POST `/api/issue-types/add`
                                                 <option>Network Issue</option>
                                                 <option>Billing Issue</option>
                                                 <option>Technical Support</option>
+                                            </select>
+                                        </td>
+                                        <td>
+                                            <select>
+                                                <option>Dongle</option>
+                                                <option>Ethernet (Wired)</option>
+                                                <option>Wi-Fi (Wireless Router)</option>
+                                                <option>Others</option>
                                             </select>
                                         </td>
                                         <td><textarea placeholder="Description"></textarea></td>
@@ -353,6 +364,7 @@ POST `/api/issue-types/add`
                                                 <th>Caller Name</th>
                                                 <th>Caller Number</th>
                                                 <th>Issue Type</th>
+                                                <th>Network</th>
                                                 <th>Description</th>
                                                 <th>Date & Time</th>
                                             </tr>
@@ -364,6 +376,7 @@ POST `/api/issue-types/add`
                                                     <td>${log.callerName}</td>
                                                     <td>${log.callerNumber}</td>
                                                     <td>${log.issueType}</td>
+                                                    <td>${log.network}</td>
                                                     <td>${log.description}</td>
                                                     <td>${log.dateTime}</td>
                                                 </tr>
