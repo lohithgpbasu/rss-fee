@@ -1,172 +1,283 @@
-# Call Logs Custom Tag – Functional Requirement
+# Call Logs Custom Web Component – Functional Requirement
 
 ## Overview
 
-We need to create a **Call Logs Custom Tag** that will be inserted into the **Xibo CMS Display Name Row**.
+A reusable custom Web Component named:
 
-This custom tag will allow users to:
+```html
+<call-logs></call-logs>
+```
 
-* Save call-related information into a MySQL database
-* View previously saved call history records
-* Associate all records with a specific Display Name
+will be embedded inside each Display row in the Xibo CMS Display page.
+
+The component will allow users to:
+
+* Log support/customer calls against a Display
+* Store call information in MySQL
+* View recent call history for that Display
+* Associate all records with the corresponding Display ID and Display Name
+
+---
+
+# Component Usage
+
+The component will be rendered dynamically for each Xibo Display row.
+
+Example:
+
+```html
+<call-logs
+    display-id="123"
+    display-name="Test TV AIPL">
+</call-logs>
+```
+
+Attributes:
+
+| Attribute    | Description                 |
+| ------------ | --------------------------- |
+| display-id   | Unique Display Identifier   |
+| display-name | Human-readable Display Name |
+
+The component should display the Display Name in the UI and use the Display ID internally for saving and fetching records.
 
 ---
 
 # UI Design
 
-## Single Row Form
+## Call Log Entry Form
 
-### Input Fields
+### Header Section
 
-| Field              | Type                        | Validation | Notes                                                                       | 
-| ------------------ | --------------------------  | ---------- | ----------------------------------------------------------------------------|
-| Display Name       | Searchable Select Dropdown  | Required   | Values will be fetched from a different database using an external API call |
-| Name               | Text Input                  | Required   | Customer/User Name                                                          |
-| Phone Number       | Text Input                  | Required   | Customer Phone Number                                                       |
-| Issue Type         | Dropdown                    | Required   | Predefined “Known Issues” will be hardcoded                                 |
-| Add New Issue Type | Optional Input              | Optional   | If issue type is not available, user can add a new issue                    |
-| Issue Description  | Text Area                   | Required   | Detailed issue description                                                  |
-| Save Button        | Action Button               | -          | Saves data into MySQL DB with timestamp                                     |
+| Element             | Description                     |
+| ------------------- | ------------------------------- |
+| Display Name        | Current Display Name            |
+| Call History Button | Opens recent call history modal |
+
+Example:
+
+```text
+Test TV AIPL                              [Call History]
+```
 
 ---
 
-# Issue Type Behavior
+## Input Fields
 
-## Default Behavior
+| Field         | Type       | Validation |
+| ------------- | ---------- | ---------- |
+| Caller Name   | Text Input | Required   |
+| Caller Number | Text Input | Required   |
+| Issue Type    | Dropdown   | Required   |
+| Network       | Dropdown   | Required   |
+| Description   | Text Area  | Required   |
+| Save          | Button     | Action     |
 
-* Known Issues will be available in the dropdown by default.
+---
 
-## Dynamic Add Behavior
+## Issue Type Options
 
-If the required issue is not available:
+Default values:
 
-1. User can add a new issue type
-2. Newly added issue type will be:
+* Network Issue
+* Billing Issue
+* Technical Support
 
-   * Stored in MySQL DB
-   * Automatically available in the dropdown for future selections
+Future enhancement:
+
+* Allow administrators to manage Issue Types through database configuration.
+
+---
+
+## Network Options
+
+Default values:
+
+* Dongle
+* Ethernet (Wired)
+* Wi-Fi (Wireless Router)
+* Others
 
 ---
 
 # Save Operation
 
-On clicking **Save Button**:
+When Save is clicked:
 
-* Validate all required fields
-* Save record into MySQL DB
-* Store current timestamp
-* Associate record with selected Display Name
+1. Validate required fields
+2. Create payload
+3. Store record in MySQL
+4. Generate timestamp automatically
+5. Associate record with current Display ID and Display Name
+
+Example payload:
+
+```json
+{
+  "displayId": 123,
+  "displayName": "Test TV AIPL",
+  "callerName": "John Doe",
+  "callerNumber": "1234567890",
+  "issueType": "Network Issue",
+  "network": "Wi-Fi (Wireless Router)",
+  "description": "Internet not working"
+}
+```
 
 ---
 
-# Database Fields
+# Database Design
 
 ## Call Logs Table
 
-| Column Name       | Type                              |
-| ----------------- | --------------------------------- |
-| id                | INT (Primary Key, Auto Increment) |
-| display_name      | VARCHAR                           |
-| call_log          | JSON                              |
-| timestamp         | TiMEDATE                          |
+| Column Name  | Type                     |
+| ------------ | ------------------------ |
+| id           | INT (PK, Auto Increment) |
+| display_id   | VARCHAR                  |
+| display_name | VARCHAR                  |
+| call_log     | JSON                     |
+| created_at   | TIMESTAMP                |
+
+Example JSON:
+
+```json
+{
+  "callerName": "John Doe",
+  "callerNumber": "1234567890",
+  "issueType": "Network Issue",
+  "network": "Wi-Fi (Wireless Router)",
+  "description": "Internet not working"
+}
+```
 
 ---
 
 ## Issue Types Table
 
-| Column Name | Type                              |
-| ----------- | --------------------------------- |
-| id          | INT (Primary Key, Auto Increment) |
-| issue_name  | VARCHAR                           |
-| created_at  | TIMESTAMP                         |
+| Column Name | Type                     |
+| ----------- | ------------------------ |
+| id          | INT (PK, Auto Increment) |
+| issue_name  | VARCHAR                  |
+| created_at  | TIMESTAMP                |
 
 ---
 
-# Actions
+# Call History
 
-## Call History Button
+## History Button
 
-A “Call History” action/button should be available.
+Each component instance should contain a Call History button.
 
----
-
-# Call History Modal
-
-## Functionality
-
-When user clicks **Call History**:
-
-* Open modal popup
-* Show all previously saved calls for the selected Display Name
-* View-only access
-
-## Modal Fields
-
-| Field             |
-| ----------------- |
-| Customer Name     |
-| Phone Number      |
-| Issue Type        |
-| Issue Description |
-| Timestamp         |
+Clicking the button opens a modal dialog.
 
 ---
 
-# Important Condition
+## History Modal
 
-Since this custom tag will be inserted inside the **Xibo CMS Display Name Row**:
+### Behaviour
 
-* The selected Display Name context is already known
-* Therefore, the **Call History Modal should NOT contain the Display Name dropdown**
-* History should automatically load based on the current Display Name row context
+* Read-only
+* Shows recent 5 records only
+* Filtered automatically by Display ID
+* No Display selector shown inside modal
+
+### Columns
+
+| Field         |
+| ------------- |
+| Caller Name   |
+| Caller Number |
+| Issue Type    |
+| Network       |
+| Description   |
+| Date & Time   |
+
+---
+
+# Data Loading Strategy
+
+## Initial Page Load
+
+When the Xibo Display page loads:
+
+1. Load Display data
+2. Load recent call history data
+3. Cache results in memory
+
+Goal:
+
+Avoid making additional API requests every time a user clicks Call History.
 
 ---
 
 # API Requirements
 
-## External API
+## Save Call Log
 
-Used for:
-
-* Fetching searchable Display Name list
-
-## Internal APIs Needed
-
-### Save Call Log
-
-POST `/api/call-logs/save`
-
-### Fetch Call History
-
-GET `/api/call-logs/history/{displayId}`
-
-### Fetch Issue Types
-
-GET `/api/issue-types`
-
-### Add New Issue Type
-
-POST `/api/issue-types/add`
+```http
+POST /api/call-logs/save
+```
 
 ---
 
-# Expected Flow
+## Fetch Call History
 
-1. User opens Xibo CMS row
-2. Custom tag loads with current Display Name context
-3. User fills:
+```http
+GET /api/call-logs/history/{displayId}
+```
 
-   * Name
-   * Phone Number
+Returns latest 5 records.
+
+---
+
+## Fetch Issue Types
+
+```http
+GET /api/issue-types
+```
+
+---
+
+# Component Requirements
+
+The solution must be implemented as a reusable Web Component:
+
+```html
+<call-logs
+    display-id="123"
+    display-name="Test TV AIPL">
+</call-logs>
+```
+
+Requirements:
+
+* Multiple instances may exist on the same page
+* Each instance manages its own form and modal
+* Avoid global IDs
+* Use component-scoped event handlers
+* Display Name shown in UI
+* Display ID used internally for save and fetch operations
+
+---
+
+# Expected User Flow
+
+1. Xibo Display page loads
+2. Display rows are rendered
+3. A `<call-logs>` component is created for each Display
+4. User enters:
+
+   * Caller Name
+   * Caller Number
    * Issue Type
-   * Issue Description
-4. User clicks Save
-5. Data stored in MySQL with timestamp
-6. User clicks Call History
-7. Modal opens showing all previous records for that Display Name
-
-
-# UI Prototype Design:
+   * Network
+   * Description
+5. User clicks Save
+6. Record is stored against the Display ID
+7. User clicks Call History
+8. Modal opens
+9. Recent 5 call records are displayed
+10. User closes modal
 
 ```HTML
 
