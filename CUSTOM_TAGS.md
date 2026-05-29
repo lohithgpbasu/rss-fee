@@ -19,7 +19,7 @@ This custom tag will allow users to:
 ### Input Fields
 
 | Field              | Type                        | Validation | Notes                                                                       | 
-| ------------------ | --------------------------  | ---------- | --------------------------------------------------------------------------|
+| ------------------ | --------------------------  | ---------- | ----------------------------------------------------------------------------|
 | Display Name       | Searchable Select Dropdown  | Required   | Values will be fetched from a different database using an external API call |
 | Name               | Text Input                  | Required   | Customer/User Name                                                          |
 | Phone Number       | Text Input                  | Required   | Customer Phone Number                                                       |
@@ -67,11 +67,8 @@ On clicking **Save Button**:
 | ----------------- | --------------------------------- |
 | id                | INT (Primary Key, Auto Increment) |
 | display_name      | VARCHAR                           |
-| customer_name     | VARCHAR                           |
-| phone_number      | VARCHAR                           |
-| issue_type        | VARCHAR                           |
-| issue_description | TEXT                              |
-| created_at        | TIMESTAMP                         |
+| call_log          | JSON                              |
+| timestamp         | TiMEDATE                          |
 
 ---
 
@@ -141,7 +138,7 @@ POST `/api/call-logs/save`
 
 ### Fetch Call History
 
-GET `/api/call-logs/history/{displayName}`
+GET `/api/call-logs/history/{displayId}`
 
 ### Fetch Issue Types
 
