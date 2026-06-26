@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Client-Side Storage Demonstration (With Expiry)</title>
+    <style>
+        :root {
+            --bg-color: #f4f4f9;
+            --text-color: #333;
+            --card-bg: #fff;
+            --primary: #007bff;
+            --primary-hover: #0056b3;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            max-width: 90%;
+            margin: 0 auto;
+            padding: 10px;
+            transition: all 0.3s ease;
+        }
+        body.dark-mode {
+            --bg-color: #1a1a1a;
+            --text-color: #f4f4f9;
+            --card-bg: #2d2d2d;
+        }
+        .container {
+            background: var(--card-bg);
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+        .storage-card {
+            background: var(--card-bg);
+            border: 1px solid #ccc;
+            padding: 15px;
+            border-radius: 6px;
+        }
+        .storage-card h3 {
+            margin-top: 0;
+            color: var(--primary);
+            border-bottom: 2px solid var(--primary);
+            padding-bottom: 5px;
+        }
+        label { display: block; margin-top: 10px; font-weight: bold; }
+        input, select, textarea {
+            width: 100%; padding: 8px; margin-top: 5px;
+            border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box;
+        }
+        button {
+            background-color: var(--primary); color: white; border: none;
+            padding: 10px 20px; margin-top: 15px; border-radius: 4px;
+            cursor: pointer; font-size: 16px; width: 100%;
+        }
+        button:hover { background-color: var(--primary-hover); }
+        button:disabled { background-color: #6c757d; cursor: not-allowed; }
+        #status-area {
+            text-align: center; font-size: 1.2em; font-weight: bold;
+            color: #d9534f; min-height: 30px; margin: 15px 0;
+        }
+        .data-display {
+            font-family: monospace; background: rgba(0,0,0,0.05);
+            padding: 10px; border-radius: 4px; white-space: pre-wrap; word-wrap: break-word;
+        }
+        .notice { font-size: 0.9em; color: #d9534f; text-align: center; margin-bottom: 15px;}
+    </style>
+</head>
+<body>
+
+    <h1>Web Storage APIs Demo</h1>
+    <div class="notice">Note: This page will automatically reload every 1 minute. Cookies and SessionStorage are set to expire in 1 minute.</div>
+
+    <div class="container">
+        <h2>Enter Data</h2>
+        <div class="grid">
+            <div>
+                <label for="cookieInput">Username (Cookies):</label>
+                <input type="text" id="cookieInput" placeholder="e.g., JaneDoe88">
+            </div>
+            <div>
+                <label for="localInput">UI Theme (LocalStorage):</label>
+                <select id="localInput">
+                    <option value="light">Light Mode</option>
+                    <option value="dark">Dark Mode</option>
+                </select>
+            </div>
+            <div>
+                <label for="sessionInput">Temp Session ID (SessionStorage):</label>
+                <input type="text" id="sessionInput" placeholder="e.g., token-12345">
+            </div>
+        </div>
+        <label for="idbInput">Workspace Notes (IndexedDB):</label>
+        <textarea id="idbInput" rows="3" placeholder="Enter a large amount of text here..."></textarea>
+        
+        <button id="saveBtn" onclick="saveData()">Save All Data</button>
+    </div>
+
+    <div id="status-area">Ready. Data will automatically load below if it exists.</div>
+
+    <div class="container">
+        <h2>Retrieved Data</h2>
+        <div class="grid">
+            <div class="storage-card">
+                <h3>Cookies</h3>
+                <div class="data-display" id="cookieOutput">Waiting...</div>
+            </div>
+            <div class="storage-card">
+                <h3>LocalStorage</h3>
+                <div class="data-display" id="localOutput">Waiting...</div>
+            </div>
+            <div class="storage-card">
+                <h3>SessionStorage</h3>
+                <div class="data-display" id="sessionOutput">Waiting...</div>
+            </div>
+            <div class="storage-card">
+                <h3>IndexedDB</h3>
+                <div class="data-display" id="idbOutput">Waiting...</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ==========================================
+// Auto-Refresh Data Logic (No Page Reload)
+// ==========================================
+setInterval(() => {
+    try {
+        retrieveAndDisplayData();
+    } catch (e) {
+        console.error("Refresh interval error:", e);
+    }
+}, 60000);
+
+// ==========================================
+// 1. IndexedDB Setup (With Error Handling)
+// ==========================================
+const dbName = "DemoWorkspaceDB";
+let db = null;
+
+try {
+    const request = indexedDB.open(dbName, 1);
+    
+    request.onupgradeneeded = function(event) {
+        db = event.target.result;
+        if (!db.objectStoreNames.contains("userNotes")) {
+            db.createObjectStore("userNotes", { keyPath: "id" });
+        }
+    };
+
+    request.onsuccess = function(event) {
+        db = event.target.result;
+        retrieveAndDisplayData();
+    };
+
+    request.onerror = function(event) {
+        console.warn("IndexedDB blocked by player:", event.target.errorCode);
+        document.getElementById('idbOutput').innerText = "IndexedDB is blocked by this display.";
+        retrieveAndDisplayData(); // Continue loading other data
+    };
+} catch (error) {
+    console.error("Fatal IndexedDB Error:", error);
+    document.getElementById('idbOutput').innerText = "IndexedDB not supported in this environment.";
+    // Call retrieve anyway to try and load Local/Session storage
+    window.addEventListener('load', retrieveAndDisplayData);
+}
+
+// ==========================================
+// 2. Cookie Helper Functions (With Error Handling)
+// ==========================================
+function setCookie(name, value, minutes) {
+    try {
+        const date = new Date();
+        date.setTime(date.getTime() + (minutes * 60 * 1000));
+        document.cookie = `${name}=${value};expires=${date.toUTCString()};path=/`;
+    } catch (e) {
+        console.warn("Cookies blocked:", e);
+    }
+}
+
+function getCookie(name) {
+    try {
+        const cookieName = name + "=";
+        const decodedCookie = decodeURIComponent(document.cookie);
+        const ca = decodedCookie.split(';');
+        for(let i = 0; i < ca.length; i++) {
+            let c = ca[i];
+            while (c.charAt(0) == ' ') c = c.substring(1);
+            if (c.indexOf(cookieName) == 0) return c.substring(cookieName.length, c.length);
+        }
+    } catch (e) {
+        console.warn("Cookie read blocked:", e);
+    }
+    return "";
+}
+
+// ==========================================
+// 3. Custom SessionStorage Expiry Wrapper
+// ==========================================
+function setSessionDataWithExpiry(key, value, ttlMinutes) {
+    try {
+        const now = new Date();
+        const item = { value: value, expiry: now.getTime() + (ttlMinutes * 60 * 1000) };
+        sessionStorage.setItem(key, JSON.stringify(item));
+    } catch (e) {
+        console.warn("SessionStorage blocked:", e);
+    }
+}
+
+function getSessionDataWithExpiry(key) {
+    try {
+        const itemStr = sessionStorage.getItem(key);
+        if (!itemStr) return null;
+
+        const item = JSON.parse(itemStr);
+        const now = new Date();
+
+        if (now.getTime() > item.expiry) {
+            sessionStorage.removeItem(key);
+            return null;
+        }
+        return item.value;
+    } catch (e) {
+        console.warn("SessionStorage read blocked:", e);
+        return null;
+    }
+}
+
+// ==========================================
+// 4. Main Save Function
+// ==========================================
+function saveData() {
+    const user = document.getElementById('cookieInput').value;
+    const theme = document.getElementById('localInput').value;
+    const sessionID = document.getElementById('sessionInput').value;
+    const notes = document.getElementById('idbInput').value;
+
+    document.getElementById('cookieOutput').innerText = "Processing...";
+    document.getElementById('localOutput').innerText = "Processing...";
+    document.getElementById('sessionOutput').innerText = "Processing...";
+    document.getElementById('idbOutput').innerText = "Processing...";
+    
+    document.getElementById('saveBtn').disabled = true;
+
+    setCookie("demoUsername", user, 1);
+    setSessionDataWithExpiry("demoSessionID", sessionID, 1);
+
+    try {
+        localStorage.setItem("demoTheme", theme);
+    } catch (e) {
+        console.warn("LocalStorage blocked:", e);
+    }
+
+    if (db) {
+        try {
+            const transaction = db.transaction(["userNotes"], "readwrite");
+            const store = transaction.objectStore("userNotes");
+            store.put({ id: "note_1", content: notes, timestamp: new Date() });
+        } catch (e) {
+            console.warn("IndexedDB write failed:", e);
+        }
+    }
+
+    startCountdown();
+}
+
+// ==========================================
+// 5. Countdown Timer Logic
+// ==========================================
+function startCountdown() {
+    let timeLeft = 10;
+    const statusArea = document.getElementById('status-area');
+    
+    const timer = setInterval(() => {
+        statusArea.innerText = `Data saved! Retrieving and displaying in ${timeLeft} seconds...`;
+        timeLeft--;
+
+        if (timeLeft < 0) {
+            clearInterval(timer);
+            statusArea.innerText = "Data successfully retrieved! Display updates every 1 minute.";
+            retrieveAndDisplayData();
+            document.getElementById('saveBtn').disabled = false;
+        }
+    }, 1000);
+}
+
+// ==========================================
+// 6. Retrieve & Display Function
+// ==========================================
+function retrieveAndDisplayData() {
+    // Cookies
+    const savedUser = getCookie("demoUsername");
+    document.getElementById('cookieOutput').innerText = savedUser || "No cookie found / Expired";
+
+    // LocalStorage
+    try {
+        const savedTheme = localStorage.getItem("demoTheme");
+        document.getElementById('localOutput').innerText = savedTheme || "No local data";
+        if (savedTheme === 'dark') document.body.classList.add('dark-mode');
+        else document.body.classList.remove('dark-mode');
+    } catch (e) {
+        document.getElementById('localOutput').innerText = "LocalStorage blocked by player.";
+    }
+
+    // SessionStorage
+    const savedSession = getSessionDataWithExpiry("demoSessionID");
+    document.getElementById('sessionOutput').innerText = savedSession || "No session data / Expired";
+
+    // IndexedDB
+    if (db) {
+        try {
+            const transaction = db.transaction(["userNotes"], "readonly");
+            const store = transaction.objectStore("userNotes");
+            const request = store.get("note_1");
+
+            request.onsuccess = function() {
+                if (request.result) {
+                    document.getElementById('idbOutput').innerText = request.result.content;
+                } else {
+                    document.getElementById('idbOutput').innerText = "No IndexedDB data";
+                }
+            };
+            request.onerror = function() {
+                document.getElementById('idbOutput').innerText = "Error reading IndexedDB.";
+            };
+        } catch (e) {
+            document.getElementById('idbOutput').innerText = "IndexedDB transaction failed.";
+        }
+    }
+}
+    </script>
+</body>
+</html>
