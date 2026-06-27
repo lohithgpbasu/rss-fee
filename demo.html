@@ -71,6 +71,14 @@
             padding: 10px; border-radius: 4px; white-space: pre-wrap; word-wrap: break-word;
         }
         .notice { font-size: 0.9em; color: #d9534f; text-align: center; margin-bottom: 15px;}
+
+        /* TV Remote Focus State */
+        input:focus, select:focus, textarea:focus, button:focus {
+            outline: 4px solid #ff9800; /* High contrast orange for visibility from afar */
+            outline-offset: 2px;
+            box-shadow: 0 0 10px rgba(255, 152, 0, 0.5);
+            transition: all 0.1s ease;
+        }
     </style>
 </head>
 <body>
@@ -335,6 +343,52 @@ function retrieveAndDisplayData() {
         }
     }
 }
+        // ==========================================
+// TV Remote / D-Pad Spatial Navigation
+// ==========================================
+document.addEventListener('DOMContentLoaded', () => {
+    // Select all interactive elements
+    const focusableSelector = 'input, select, textarea, button';
+    let focusableElements = Array.from(document.querySelectorAll(focusableSelector));
+    
+    // Auto-focus the first input when the page loads
+    if (focusableElements.length > 0) {
+        focusableElements[0].focus();
+    }
+
+    document.addEventListener('keydown', function(e) {
+        // Re-query in case the DOM changed
+        focusableElements = Array.from(document.querySelectorAll(focusableSelector));
+        const currentIndex = focusableElements.indexOf(document.activeElement);
+
+        switch(e.key) {
+            case 'ArrowDown':
+            case 'ArrowRight':
+                e.preventDefault(); // Stop default page scrolling
+                // Move focus to the next element, loop back to start if at the end
+                const nextIndex = (currentIndex + 1) % focusableElements.length;
+                focusableElements[nextIndex].focus();
+                break;
+                
+            case 'ArrowUp':
+            case 'ArrowLeft':
+                e.preventDefault();
+                // Move focus to previous element, loop to end if at the start
+                const prevIndex = (currentIndex - 1 + focusableElements.length) % focusableElements.length;
+                focusableElements[prevIndex].focus();
+                break;
+                
+            case 'Enter':
+                // If focused on the button, trigger the click
+                if (document.activeElement.tagName === 'BUTTON') {
+                    document.activeElement.click();
+                }
+                // If focused on an input/textarea, the OS/Display will usually 
+                // natively intercept 'Enter' to open the On-Screen Keyboard (OSK).
+                break;
+        }
+    });
+});
     </script>
 </body>
 </html>
