@@ -392,8 +392,8 @@ function buildSteps(){
   s.push({op:"RegisterDisplay", dir:"Client to CMS", branch:"Runs once at app start, or whenever hardwareKey is unrecognised by the CMS.",
     desc:"Registers this Android device with the CMS using its unique hardware key. WSDL: RegisterDisplayRequest to RegisterDisplayResponse.",
     req:{serverKey:SK, hardwareKey:HK, displayName:"Lobby-Screen-01", clientType:"android", clientVersion:"4.2.1", clientCode:421, operatingSystem:"Android 13", macAddress:"DE:AD:BE:EF:00:01", xmrChannel:"a9f3-xmr-channel", xmrPubKey:"-----BEGIN PUBLIC KEY-----...", licenceResult:""},
-    res:{ActivationMessage:"<display><status code='READY'>Display is licensed and active</status><settings>...</settings></display>"}});
-  s.push({op:"LOGIC", method:"Parse ActivationMessage", dir:"On-device", branch:"If status is not READY (e.g. WAITING or added but unlicensed) show pending-approval UI and retry on interval. Here: READY, continue.",
+    res:{ActivationMessage:"<display><status code='READY'>Display is Registered. Waiting for activation.</status><settings>...</settings></display>"}});
+  s.push({op:"RegisterDisplayResponse", method:"Parse ActivationMessage", dir:"On-device", branch:"If status is not READY (e.g. WAITING or added but unlicensed) show pending-approval UI and retry on interval. Here: READY, continue.",
     desc:"ActivationMessage is a single XML string part - your app must parse it, not treat it as JSON.",
     req:{parse:"ActivationMessage XML"}, res:{status:"READY", action:"proceed to RequiredFiles"}});
   s.push({op:"RequiredFiles", dir:"Client to CMS", branch:"",
