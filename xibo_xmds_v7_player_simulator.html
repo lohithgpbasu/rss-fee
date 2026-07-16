@@ -1,0 +1,535 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Xibo XMDS v7 — Android Player Lifecycle Simulator</title>
+<style>
+  :root{
+    --bg: #0e1116;
+    --panel: #161b22;
+    --panel-2: #1c232d;
+    --border: #2b3340;
+    --border-strong: #3a4454;
+    --text: #e6e9ef;
+    --text-secondary: #9aa4b2;
+    --text-muted: #6b7484;
+    --accent: #4c8dff;
+    --accent-bg: #16233d;
+    --accent-text: #8ab4ff;
+    --warn: #e0a63c;
+    --warn-bg: #3a2f14;
+    --warn-text: #f0c674;
+    --ok: #3fb97f;
+    --mono: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    --radius: 10px;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:var(--bg);
+    color:var(--text);
+    font-family:var(--sans);
+    line-height:1.5;
+  }
+  .wrap{
+    max-width:980px;
+    margin:0 auto;
+    padding:32px 20px 80px;
+  }
+  header{
+    margin-bottom:24px;
+    padding-bottom:20px;
+    border-bottom:0.5px solid var(--border);
+  }
+  header h1{
+    font-size:22px;
+    font-weight:600;
+    margin:0 0 6px;
+  }
+  header p{
+    font-size:14px;
+    color:var(--text-secondary);
+    margin:0;
+    max-width:640px;
+  }
+  .meta-row{
+    display:flex;
+    gap:8px;
+    margin-top:14px;
+    flex-wrap:wrap;
+  }
+  .pill{
+    font-size:12px;
+    padding:4px 10px;
+    border-radius:999px;
+    border:0.5px solid var(--border-strong);
+    color:var(--text-secondary);
+    font-family:var(--mono);
+  }
+  .controls{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:12px;
+    margin-bottom:16px;
+    flex-wrap:wrap;
+  }
+  .btn-group{ display:flex; gap:8px; }
+  button{
+    font-family:var(--sans);
+    font-size:14px;
+    font-weight:500;
+    padding:9px 16px;
+    border-radius:8px;
+    border:0.5px solid var(--border-strong);
+    background:var(--panel);
+    color:var(--text);
+    cursor:pointer;
+    display:inline-flex;
+    align-items:center;
+    gap:8px;
+    transition:background .15s, transform .1s;
+  }
+  button:hover{ background:var(--panel-2); }
+  button:active{ transform:scale(0.97); }
+  button.primary{
+    background:var(--accent);
+    border-color:var(--accent);
+    color:#fff;
+  }
+  button.primary:hover{ background:#3d7ce0; }
+  button.icon-only{ padding:9px 11px; }
+  select{
+    font-family:var(--sans);
+    font-size:13px;
+    padding:8px 10px;
+    border-radius:8px;
+    border:0.5px solid var(--border-strong);
+    background:var(--panel);
+    color:var(--text);
+  }
+  #stepCounter{ font-size:13px; color:var(--text-secondary); font-family:var(--mono); }
+
+  .rail{
+    display:flex;
+    gap:6px;
+    overflow-x:auto;
+    padding-bottom:12px;
+    margin-bottom:16px;
+    scrollbar-width:thin;
+  }
+  .rail::-webkit-scrollbar{ height:6px; }
+  .rail::-webkit-scrollbar-thumb{ background:var(--border-strong); border-radius:4px; }
+  .rail-dot{
+    flex:0 0 auto;
+    padding:6px 12px;
+    border-radius:999px;
+    font-size:11px;
+    font-family:var(--mono);
+    white-space:nowrap;
+    border:0.5px solid var(--border);
+    color:var(--text-muted);
+    background:var(--panel);
+    transition:all .15s;
+  }
+  .rail-dot.active{
+    background:var(--accent-bg);
+    border-color:var(--accent);
+    color:var(--accent-text);
+    font-weight:600;
+  }
+  .rail-dot.logic.active{
+    background:var(--warn-bg);
+    border-color:var(--warn);
+    color:var(--warn-text);
+  }
+  .rail-dot.done{ opacity:0.55; }
+
+  .card{
+    background:var(--panel);
+    border:0.5px solid var(--border);
+    border-radius:var(--radius);
+    padding:18px 20px;
+    margin-bottom:16px;
+  }
+  .card-top{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    flex-wrap:wrap;
+  }
+  .badge{
+    font-size:11px;
+    font-weight:700;
+    letter-spacing:.03em;
+    padding:4px 10px;
+    border-radius:6px;
+    text-transform:uppercase;
+    background:var(--accent-bg);
+    color:var(--accent-text);
+  }
+  .badge.logic{ background:var(--warn-bg); color:var(--warn-text); }
+  .method-name{ font-size:18px; font-weight:600; }
+  .dir-badge{
+    font-size:12px;
+    color:var(--text-muted);
+    margin-left:auto;
+    font-family:var(--mono);
+  }
+  .soap-action{
+    font-size:12px;
+    color:var(--text-muted);
+    font-family:var(--mono);
+    margin:10px 0 0;
+  }
+  .method-desc{
+    font-size:14px;
+    color:var(--text-secondary);
+    margin:10px 0 0;
+    max-width:760px;
+  }
+  .branch-note{
+    font-size:12.5px;
+    color:var(--accent-text);
+    margin:10px 0 0;
+    padding:8px 12px;
+    background:var(--accent-bg);
+    border-radius:6px;
+    display:none;
+  }
+
+  .payload-grid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:16px;
+  }
+  @media (max-width:680px){ .payload-grid{ grid-template-columns:1fr; } }
+  .payload-box{
+    background:var(--panel-2);
+    border:0.5px solid var(--border);
+    border-radius:var(--radius);
+    padding:14px 16px;
+  }
+  .payload-label{
+    font-size:11px;
+    text-transform:uppercase;
+    letter-spacing:.04em;
+    color:var(--text-muted);
+    margin-bottom:8px;
+    display:flex;
+    align-items:center;
+    gap:6px;
+    font-weight:600;
+  }
+  pre{
+    font-size:12.5px;
+    font-family:var(--mono);
+    white-space:pre-wrap;
+    word-break:break-word;
+    margin:0;
+    min-height:140px;
+    max-height:340px;
+    overflow-y:auto;
+    color:var(--text);
+  }
+
+  .log-section{ margin-top:8px; }
+  .log-header{
+    font-size:12px;
+    color:var(--text-muted);
+    margin-bottom:8px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+  }
+  #logBox{
+    background:var(--panel);
+    border:0.5px solid var(--border);
+    border-radius:var(--radius);
+    padding:12px 16px;
+    font-size:12.5px;
+    font-family:var(--mono);
+    max-height:220px;
+    overflow-y:auto;
+    color:var(--text-secondary);
+  }
+  #logBox div{ padding:2px 0; border-bottom:0.5px solid var(--border); }
+  #logBox div:last-child{ border-bottom:none; }
+  #logBox div.op-net{ color:var(--accent-text); }
+  #logBox div.op-logic{ color:var(--warn-text); }
+
+  footer{
+    margin-top:32px;
+    padding-top:16px;
+    border-top:0.5px solid var(--border);
+    font-size:12px;
+    color:var(--text-muted);
+  }
+  a{ color:var(--accent-text); }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <h1>Xibo XMDS v7 — Android player lifecycle simulator</h1>
+    <p>A step-through simulation of the real XMDS SOAP contract (from <code>xmds.php</code>) in actual player operating order — registration, license check, file sync, schedule, playback, reporting, then a repeating collection loop.</p>
+    <div class="meta-row">
+      <span class="pill">14 SOAP operations</span>
+      <span class="pill">RPC / encoded</span>
+      <span class="pill">urn:xmds</span>
+      <span class="pill">3s auto-advance</span>
+    </div>
+  </header>
+
+  <div class="controls">
+    <div class="btn-group">
+      <button class="primary" id="playBtn" onclick="togglePlay()">
+        <span id="playIcon">&#9654;</span> <span id="playLabel">Start player</span>
+      </button>
+      <button class="icon-only" onclick="resetAll()" title="Reset">&#8635;</button>
+      <select id="speedSelect" onchange="changeSpeed()">
+        <option value="3000">3s / step</option>
+        <option value="1500">1.5s / step</option>
+        <option value="800">0.8s / step</option>
+        <option value="6000">6s / step</option>
+      </select>
+    </div>
+    <div id="stepCounter">Stopped</div>
+  </div>
+
+  <div class="rail" id="railWrap"></div>
+
+  <div class="card">
+    <div class="card-top">
+      <span class="badge" id="protoBadge">XMDS</span>
+      <span class="method-name" id="methodName">Player idle</span>
+      <span class="dir-badge" id="dirBadge"></span>
+    </div>
+    <p class="soap-action" id="soapAction"></p>
+    <p class="method-desc" id="methodDesc">Press "Start player" — this runs the exact 14-operation XMDS v7 contract in real player order, looping forever like the actual client.</p>
+    <p class="branch-note" id="branchNote"></p>
+  </div>
+
+  <div class="payload-grid">
+    <div class="payload-box">
+      <div class="payload-label">&#8593; Client to CMS — request</div>
+      <pre id="reqBox">—</pre>
+    </div>
+    <div class="payload-box">
+      <div class="payload-label">&#8595; CMS to client — response</div>
+      <pre id="resBox">—</pre>
+    </div>
+  </div>
+
+  <div class="log-section">
+    <div class="log-header">
+      <span>Player log</span>
+      <span id="cycleTag"></span>
+    </div>
+    <div id="logBox"></div>
+  </div>
+
+  <footer>
+    Built from <code>service_v7.wsdl</code> — operations, message parts and soapActions match the real XMDS v7 contract. Branch conditions reflect standard player behavior and should be verified against your CMS's configured collection interval and layout content.
+  </footer>
+
+</div>
+
+<script>
+var HK = "AND-7F3C9D2E";
+var SK = "a1b2-cms-server-key";
+
+var files = [
+  {id:42, type:"layout", path:"42.xlf"},
+  {id:501, type:"media", path:"promo_video.mp4"},
+  {id:503, type:"font", path:"opensans.ttf"}
+];
+
+function buildSteps(){
+  var s = [];
+  s.push({op:"RegisterDisplay", dir:"Client to CMS", branch:"Runs once at app start, or whenever hardwareKey is unrecognised by the CMS.",
+    desc:"Registers this Android device with the CMS using its unique hardware key. WSDL: RegisterDisplayRequest to RegisterDisplayResponse.",
+    req:{serverKey:SK, hardwareKey:HK, displayName:"Lobby-Screen-01", clientType:"android", clientVersion:"4.2.1", clientCode:421, operatingSystem:"Android 13", macAddress:"DE:AD:BE:EF:00:01", xmrChannel:"a9f3-xmr-channel", xmrPubKey:"-----BEGIN PUBLIC KEY-----...", licenceResult:""},
+    res:{ActivationMessage:"<display><status code='READY'>Display is licensed and active</status><settings>...</settings></display>"}});
+  s.push({op:"LOGIC", method:"Parse ActivationMessage", dir:"On-device", branch:"If status is not READY (e.g. WAITING or added but unlicensed) show pending-approval UI and retry on interval. Here: READY, continue.",
+    desc:"ActivationMessage is a single XML string part - your app must parse it, not treat it as JSON.",
+    req:{parse:"ActivationMessage XML"}, res:{status:"READY", action:"proceed to RequiredFiles"}});
+  s.push({op:"RequiredFiles", dir:"Client to CMS", branch:"",
+    desc:"Returns RequiredFilesXml - an XML document listing every file (layout, media, resource, dependency) this display needs.",
+    req:{serverKey:SK, hardwareKey:HK},
+    res:{RequiredFilesXml:"<files><file type='layout' id='42' size='18432' md5='9e1f...' path='42.xlf'/><file type='media' id='501' size='48234496' md5='3ab2...' path='promo_video.mp4'/><file type='font' id='503' size='184320' md5='77cd...' path='opensans.ttf'/></files>"}});
+  files.forEach(function(f){
+    s.push({op:"GetFile", dir:"Client to CMS", branch:"Called once per file in RequiredFilesXml where local md5 does not match. chunkOffset/chuckSize (WSDL's own typo) let you resume partial downloads.",
+      desc:"Streams file id "+f.id+" ("+f.type+") back as base64Binary - decode and write to local storage in chunks.",
+      req:{serverKey:SK, hardwareKey:HK, fileId:f.id, fileType:f.type, chunkOffset:0, chuckSize:524288},
+      res:{file:"[base64Binary " + (f.type==="media" ? "~46MB" : f.type==="font" ? "~180KB" : "~18KB") + " chunk]"}});
+  });
+  s.push({op:"MediaInventory", dir:"Client to CMS", branch:"Sent once the per-file download pass finishes, reporting exactly what is on disk now.",
+    desc:"mediaInventory is a single XML string part built by the client listing complete/incomplete files.",
+    req:{serverKey:SK, hardwareKey:HK, mediaInventory:"<files><file id='42' complete='1' md5='9e1f...'/><file id='501' complete='1' md5='3ab2...'/><file id='503' complete='1' md5='77cd...'/></files>"},
+    res:{success:true}});
+  s.push({op:"Schedule", dir:"Client to CMS", branch:"",
+    desc:"Returns ScheduleXml - layouts, date ranges, priorities, and any overlay or interrupt layouts.",
+    req:{serverKey:SK, hardwareKey:HK},
+    res:{ScheduleXml:"<schedule generated='2026-07-16T09:12:00'><layout file='42' fromdt='2026-07-16 00:00:00' todt='2026-07-17 00:00:00' priority='1' scheduleid='7'/></schedule>"}});
+  s.push({op:"GetResource", dir:"Client to CMS", branch:"Called per widget region that needs server-rendered HTML (text/webpage/ticker widgets) rather than a static file.",
+    desc:"Fetches rendered HTML for a specific region/media combination inside layout 42.",
+    req:{serverKey:SK, hardwareKey:HK, layoutId:42, regionId:"region_3", mediaId:"media_9"},
+    res:{resource:"<html>...rendered widget html...</html>"}});
+  s.push({op:"GetData", dir:"Client to CMS", branch:"Called for any data-driven widget (e.g. a feed or table widget) that needs fresh data, not just rendered HTML.",
+    desc:"Fetches raw data for a specific widget id, separate from GetResource's rendered HTML.",
+    req:{serverKey:SK, hardwareKey:HK, widgetId:9},
+    res:{data:"{'items':[{'title':'Q3 sales','value':128400}]}"}});
+  s.push({op:"GetDependency", dir:"Client to CMS", branch:"Used for player-bundle/font/interactive-control dependencies referenced by a layout, separate from the RequiredFiles media list.",
+    desc:"Streams a player dependency file (e.g. a JS bundle a widget needs) as chunked base64Binary.",
+    req:{serverKey:SK, hardwareKey:HK, fileType:"bundle", id:"vendor.min.js", chunkOffset:0, chunkSize:262144},
+    res:{file:"[base64Binary bundle chunk]"}});
+  s.push({op:"GetWeather", dir:"Client to CMS", branch:"Only called if the current layout has a weather widget or module.",
+    desc:"Returns weather condition data as a string payload for weather-module layouts.",
+    req:{serverKey:SK, hardwareKey:HK},
+    res:{data:"{'tempC':29,'condition':'Partly cloudy','location':'Bengaluru'}"}});
+  s.push({op:"LOGIC", method:"Render and play layout 42", dir:"On-device", branch:"No network call - your Android UI parses the XLF, lays out regions, starts playback of images, video, webviews.",
+    desc:"This is where your app code takes over from the protocol.",
+    req:{action:"local playback"}, res:{status:"playing", layoutId:42}});
+  s.push({op:"SubmitStats", dir:"Client to CMS", branch:"Fired as proof-of-play, on an interval or when a layout or media item finishes playing.",
+    desc:"statXml is client-built proof-of-play data - this is effectively the billing record.",
+    req:{serverKey:SK, hardwareKey:HK, statXml:"<stats><stat type='layout' fromdt='2026-07-16 09:00:00' todt='2026-07-16 09:00:20' scheduleid='7' layoutid='42'/></stats>"},
+    res:{success:true}});
+  s.push({op:"ReportFaults", dir:"Client to CMS", branch:"Only sent if the player hit a playback fault (e.g. corrupt media, failed render) this cycle - skipped otherwise.",
+    desc:"Reports structured player faults distinct from general logs.",
+    req:{serverKey:SK, hardwareKey:HK, fault:"<fault code='5001' widgetId='9'>Data widget render timeout</fault>"},
+    res:{success:true}});
+  s.push({op:"SubmitLog", dir:"Client to CMS", branch:"Only sent if there are queued log entries this cycle.",
+    desc:"Flushes the local log buffer up to the CMS for remote diagnostics.",
+    req:{serverKey:SK, hardwareKey:HK, logXml:"<logs><log date='2026-07-16 09:12' category='player'>layout 42 rendered ok</log></logs>"},
+    res:{success:true}});
+  s.push({op:"SubmitScreenShot", dir:"Client to CMS", branch:"Only sent when the CMS has requested a screenshot for this display (via /display/requestscreenshot REST call) - not every cycle.",
+    desc:"Uploads a captured screenshot as base64Binary so an admin can remotely verify what is on screen.",
+    req:{serverKey:SK, hardwareKey:HK, screenShot:"[base64Binary png ~340KB]"},
+    res:{success:true}});
+  s.push({op:"NotifyStatus", dir:"Client to CMS", branch:"",
+    desc:"status is a JSON string part - heartbeat with current layout, free space, timezone, etc.",
+    req:{serverKey:SK, hardwareKey:HK, status:"{'currentLayoutId':42,'availableSpace':'14GB','timeZone':'Asia/Kolkata'}"},
+    res:{success:true}});
+  s.push({op:"LOGIC", method:"Sleep until next collection interval", dir:"On-device", branch:"CMS-configured collection interval (Display Settings). Loop repeats from RequiredFiles, not RegisterDisplay - forever, for the life of the device.",
+    desc:"Player keeps playing the cached schedule while idle, then wakes and re-syncs.",
+    req:{action:"local timer"}, res:{next:"RequiredFiles", loopsForever:true}});
+  return s;
+}
+var steps = buildSteps();
+
+var idx = -1;
+var timer = null;
+var logs = [];
+var cycle = 1;
+var speed = 3000;
+
+function renderRail(){
+  var rail = document.getElementById('railWrap');
+  rail.innerHTML = '';
+  for (var i = 0; i < steps.length; i++){
+    var s = steps[i];
+    var dot = document.createElement('div');
+    dot.className = 'rail-dot' + (s.op === 'LOGIC' ? ' logic' : '');
+    dot.textContent = (s.op === "GetFile" ? "GetFile " + i : (s.op || s.method));
+    dot.id = 'rail-' + i;
+    rail.appendChild(dot);
+  }
+}
+
+function fmt(o){ return typeof o === 'string' ? o : JSON.stringify(o, null, 2); }
+
+function paint(){
+  document.getElementById('stepCounter').textContent = idx < 0 ? 'Stopped' : ('Step ' + (idx+1) + ' / ' + steps.length);
+  document.getElementById('cycleTag').textContent = idx < 0 ? '' : ('collection cycle ' + cycle);
+  var dots = document.querySelectorAll('.rail-dot');
+  dots.forEach(function(d, i){
+    d.classList.remove('active');
+    d.classList.toggle('done', idx >= 0 && i < idx);
+  });
+  if(idx < 0) return;
+  var s = steps[idx];
+  var railDot = document.getElementById('rail-'+idx);
+  railDot.classList.add('active');
+  railDot.scrollIntoView({behavior:'smooth', inline:'center', block:'nearest'});
+
+  var isLogic = s.op === 'LOGIC';
+  var badge = document.getElementById('protoBadge');
+  badge.textContent = isLogic ? 'LOGIC' : 'SOAP / XMDS';
+  badge.classList.toggle('logic', isLogic);
+
+  document.getElementById('methodName').textContent = isLogic ? s.method : s.op;
+  document.getElementById('dirBadge').textContent = s.dir;
+  document.getElementById('soapAction').textContent = isLogic ? '' : ('soapAction: urn:xmds#' + s.op + '   |   style: rpc / encoded');
+  document.getElementById('methodDesc').textContent = s.desc;
+  var bn = document.getElementById('branchNote');
+  if(s.branch){ bn.style.display='block'; bn.textContent = 'Branch logic: ' + s.branch; } else { bn.style.display='none'; }
+  document.getElementById('reqBox').textContent = fmt(s.req);
+  document.getElementById('resBox').textContent = fmt(s.res);
+
+  var entry = document.createElement('div');
+  entry.className = isLogic ? 'op-logic' : 'op-net';
+  entry.textContent = 'cycle ' + cycle + '  #' + (idx+1) + '  ' + (isLogic ? s.method : s.op);
+  var logBox = document.getElementById('logBox');
+  logBox.insertBefore(entry, logBox.firstChild);
+  while(logBox.children.length > 16){ logBox.removeChild(logBox.lastChild); }
+}
+
+function step(){
+  idx = idx + 1;
+  if(idx >= steps.length){
+    cycle += 1;
+    idx = 2;
+  }
+  paint();
+}
+
+function togglePlay(){
+  if(timer){ stopPlay(); return; }
+  step();
+  timer = setInterval(step, speed);
+  updateBtn(true);
+}
+
+function stopPlay(){
+  clearInterval(timer);
+  timer = null;
+  updateBtn(false);
+}
+
+function changeSpeed(){
+  speed = parseInt(document.getElementById('speedSelect').value, 10);
+  if(timer){ clearInterval(timer); timer = setInterval(step, speed); }
+}
+
+function updateBtn(playing){
+  document.getElementById('playIcon').innerHTML = playing ? '&#10074;&#10074;' : '&#9654;';
+  document.getElementById('playLabel').textContent = playing ? 'Pause' : 'Start player';
+}
+
+function resetAll(){
+  stopPlay();
+  idx = -1;
+  cycle = 1;
+  logs = [];
+  document.getElementById('logBox').innerHTML = '';
+  document.getElementById('methodName').textContent = 'Player idle';
+  document.getElementById('soapAction').textContent = '';
+  document.getElementById('methodDesc').textContent = 'Press "Start player" - this runs the exact 14-operation XMDS v7 contract in real player order, looping forever like the actual client.';
+  document.getElementById('branchNote').style.display = 'none';
+  document.getElementById('reqBox').textContent = '-';
+  document.getElementById('resBox').textContent = '-';
+  document.getElementById('protoBadge').textContent = 'XMDS';
+  document.getElementById('protoBadge').classList.remove('logic');
+  document.getElementById('dirBadge').textContent = '';
+  paint();
+}
+
+renderRail();
+paint();
+</script>
+</body>
+</html>
