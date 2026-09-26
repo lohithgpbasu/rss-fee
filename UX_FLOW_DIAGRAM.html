@@ -422,7 +422,9 @@ table.errtable tr:nth-child(even){background:#f8fafc;}
         <li>Customer receives an acknowledgement number on screen — this is their only "login," used together with their email for every future lookup.</li>
         <li>The ticket is routed to the respective <b>Project Coordinator's</b> dashboard in the DSS Issue Tracker.</li>
         <li>When the coordinator opens the ticket, its status auto-changes from Pending to <b>Acknowledged</b>, and an acknowledgement email is sent.</li>
-        <li>Support Staff (and Managers, with broader access) then work the ticket in the DSS Issue Tracker — moving it to In Progress and adding any number of remarks along the way, especially if resolution takes longer.</li>
+        <li>Behind the scenes, staff log into the DSS Issue Tracker (Trackwise) — session-based login with an optional project-based OTP — and see the ticket on their Dashboard and Ticket List.</li>
+        <li>A Manager (Trackwise "Admin") or SuperAdmin reviews and approves it, moving its internal status to In Progress; the approval is synchronized outward to an external ticket system.</li>
+        <li>Support Staff then work the ticket — uploading attachments and adding any number of remarks, especially if resolution takes longer — all visible to the customer on their tracking timeline.</li>
         <li>Each meaningful status change and remark is reflected on the customer's tracking timeline; resolution/closed emails include a direct tracking link.</li>
         <li>Customer can return any time and enter the ack number + email to see live status — never anyone else's ticket, and never editable once submitted.</li>
         <li>When resolved or closed, the customer sees the fix summary, proof files and total time taken — the journey ends here; a new issue needs a new ticket.</li>
@@ -482,9 +484,10 @@ const SCREENS = [
 
 const ROLES = [
   { name:'Customer', desc:'Anyone with a valid project link. No account and no login — enters the required details directly and submits. Can only track a ticket that matches their own acknowledgement number + email, cannot edit a submitted ticket, and must raise a new ticket for a new issue.' },
-  { name:'Project Coordinator', desc:'Receives every ticket raised for their project on their own dashboard inside the DSS Issue Tracker. Opening the ticket there is what moves it from Pending to Acknowledged and triggers the acknowledgement email — no separate "acknowledge" action.' },
-  { name:'Support Staff', desc:'Views, assigns, updates and closes customer tickets in the existing DSS Issue Tracker — a separate system, out of scope for this portal. Works the ticket after it is acknowledged, and can add any number of remarks while it is open.' },
-  { name:'Manager', desc:'A Support Staff user with broader access inside the DSS Issue Tracker — can view and act across tickets beyond their own assignment.' },
+  { name:'Project Coordinator', desc:'Receives every ticket raised for their project on their own dashboard inside the DSS Issue Tracker. Opening the ticket there is what moves it from Pending to Acknowledged and triggers the acknowledgement email — no separate "acknowledge" action. Holds the "User" role inside the DSS Issue Tracker (Trackwise), scoped to their assigned project.' },
+  { name:'Support Staff', desc:'Views, assigns, updates and closes customer tickets in the existing DSS Issue Tracker — a separate system, out of scope for this portal. Works the ticket after it is acknowledged, and can add any number of remarks while it is open. Also a Trackwise "User" role holder, scoped to their assigned project.' },
+  { name:'Manager', desc:'Corresponds to the "Admin" role inside the DSS Issue Tracker (Trackwise): reviews and approves tickets at the project level, with broader access than a User — can view and act across tickets beyond their own assignment.' },
+  { name:'SuperAdmin', desc:'The highest-level role inside the DSS Issue Tracker (Trackwise): system-wide access across every project, plus Project Management (configuring projects, customers, OTP settings) and User Management (creating users, assigning roles and project access).' },
 ];
 
 const MODULES = [
@@ -496,6 +499,9 @@ const MODULES = [
   { name:'Email Notifications', desc:'Acknowledgement and resolution/closed emails, sent from database-defined templates.' },
   { name:'Attachments', desc:'Customer file uploads on the ticket, and proof-of-resolution files added by support.' },
   { name:'Known / Predefined-Issue Troubleshooting', desc:'If a matching open issue already has a registered solution document/PDF, it is emailed to the new customer immediately.' },
+  { name:'Internal Approval Workflow (DSS Issue Tracker)', desc:'Admin/SuperAdmin review and approve tickets inside Trackwise; approved tickets move to In Progress and are synchronized outward, or are closed/cancelled with a reason.' },
+  { name:'External API Synchronization', desc:'Approved, updated, closed and cancelled tickets are pushed to an external PHP ticket system via API; an inbound sync route also receives status updates and remarks and updates the matching local ticket.' },
+  { name:'Project & User Management (Trackwise)', desc:'SuperAdmin/Admin configure projects (customer & OTP settings) and manage internal users — their roles and which project(s) they can access.' },
 ];
 
 const JOURNEYS = [
@@ -506,6 +512,7 @@ const JOURNEYS = [
   'Receive a predefined-issue solution document automatically',
   'Verify identity via OTP before a ticket is accepted (planned)',
   'Support staff/manager add multiple remarks while working a ticket in the DSS Issue Tracker',
+  'Support staff/manager/SuperAdmin work a ticket end-to-end inside the DSS Issue Tracker: login, dashboard, approval, closure and external synchronization',
   'Watch a ticket move from Pending all the way to Resolved or Closed',
 ];
 
@@ -531,7 +538,7 @@ const ERROR_TABLE = [
   { scenario:'Editing a closed ticket', trigger:'A status/note/resolution change is attempted on a Resolved or Closed ticket (internal API)', code:'409', codeType:'error', message:'"This ticket is already closed and cannot be changed"', recovery:'Not user-facing — support staff must reopen via a new ticket or a direct DB correction' },
 ];
 
-const EXTERNAL_INTEGRATIONS = ['Gmail SMTP (acknowledgement, resolution and troubleshooting emails)', 'DSS Issue Tracker — existing support-staff system (separate, out of scope)', 'OTP delivery channel — Mobile / WhatsApp / Email (planned)'];
+const EXTERNAL_INTEGRATIONS = ['Gmail SMTP (acknowledgement, resolution and troubleshooting emails)', 'DSS Issue Tracker — existing support-staff system (separate, out of scope)', 'OTP delivery channel — Mobile / WhatsApp / Email (planned)', 'External PHP ticket system — synced from the DSS Issue Tracker (insertIssueData / UpdateIssueData / CloseIssueData / DeleteIssueData + inbound sync)', 'Customer search service (customerList API) used by staff inside the DSS Issue Tracker'];
 
 /* -------- Section canvases: nodes { id, type, col, row, title, sub, tip }, edges { from, to, label, kind } -------- */
 const SECTIONS = [
@@ -797,6 +804,54 @@ const SECTIONS = [
     {from:'sw14',to:'sw15'},{from:'sw15',to:'sw16'},{from:'sw16',to:'sw17'},
   ],
 },
+{
+  id:'trackwise', title:'8 · Inside the DSS Issue Tracker (Trackwise) — Staff Workflow',
+  desc:'How Support Staff, Managers (Trackwise "Admin") and SuperAdmins actually work day to day inside the separate DSS Issue Tracker once a ticket reaches them: login, dashboard, approval, external synchronization and closure. Customer-facing behaviour is not repeated here — see Sections 1–7.',
+  nodes:[
+    {id:'tw1',type:'start',col:0,row:0,title:'START',sub:'Support Staff / Manager / SuperAdmin opens the DSS Issue Tracker (Trackwise)'},
+    {id:'tw2',type:'screen',col:1,row:0,title:'Login / Registration screen'},
+    {id:'tw3',type:'system',col:2,row:0,title:'Authenticates',sub:'Session-based auth + bcrypt password check; optional project-based OTP'},
+    {id:'tw4',type:'decision',col:3,row:0,title:'Credentials (and OTP, if enabled) valid?'},
+    {id:'tw4b',type:'error',col:3,row:1,title:'Invalid login / OTP',sub:'Error shown; Forgot Password is available'},
+    {id:'tw5',type:'screen',col:4,row:0,title:'Dashboard',sub:'Project-level ticket totals — Pending, In Progress, Completed, Cancelled — plus charts and summary tables'},
+    {id:'tw6',type:'screen',col:5,row:0,title:'Ticket List',sub:'Every ticket for the assigned project(s), including ones raised via the customer portal'},
+    {id:'tw7',type:'action',col:6,row:0,title:'Opens a ticket (or raises one directly in Trackwise)',sub:'Project, customer, branch, contact & description; customer looked up via the customerList API'},
+    {id:'tw8',type:'decision',col:7,row:0,title:'Admin / SuperAdmin approves?'},
+    {id:'tw8b',type:'warning',col:7,row:1,title:'Sent back / stays Pending',sub:'Remains in the Ticket List for further review'},
+    {id:'tw9',type:'success',col:8,row:0,title:'Approved',sub:'Internal status → In Progress'},
+    {id:'tw10',type:'api',col:9,row:0,title:'Synced outward',sub:'insertIssueData (new) or UpdateIssueData (update) call to the external PHP ticket system'},
+    {id:'tw11',type:'action',col:10,row:0,title:'Staff works the ticket',sub:'Uploads attachments; adds remarks visible to the customer'},
+    {id:'tw12',type:'decision',col:11,row:0,title:'Outcome?'},
+    {id:'tw13',type:'success',col:12,row:0,title:'Closed with a reason',sub:'Internal status → Completed'},
+    {id:'tw14',type:'api',col:12,row:1,title:'CloseIssueData sync'},
+    {id:'tw15',type:'warning',col:11,row:2,title:'Cancelled',sub:'Soft-deleted — retained for tracking, not shown to the customer'},
+    {id:'tw16',type:'api',col:12,row:2,title:'DeleteIssueData sync'},
+    {id:'tw17',type:'external',col:9,row:1,title:'Inbound sync — POST /issues/sync',sub:'The external system can push status updates & remarks back; the matching local ticket is updated'},
+    {id:'tw18',type:'external',col:1,row:3,title:'Project Management',sub:'SuperAdmin/Admin create/edit projects and configure per-project customer & OTP settings'},
+    {id:'tw19',type:'external',col:1,row:4,title:'User Management',sub:'SuperAdmin creates internal users and assigns SuperAdmin/Admin/User roles and project access'},
+    {id:'tw20',type:'warning',col:5,row:2,title:'Note — two status vocabularies',sub:'Trackwise’s own internal lifecycle (Pending → In Progress → Completed/Cancelled) is separate from the customer-facing lifecycle in Section 5 (Pending → Acknowledged → In Progress → Resolved | Closed). Exact field-level mapping between the two: Business Rule Required.'},
+  ],
+  edges:[
+    {from:'tw1',to:'tw2'},{from:'tw2',to:'tw3'},{from:'tw3',to:'tw4'},
+    {from:'tw4',to:'tw5',label:'YES',kind:'yes'},
+    {from:'tw4',to:'tw4b',label:'NO',kind:'no'},
+    {from:'tw4b',to:'tw2',label:'retry',kind:'retry'},
+    {from:'tw5',to:'tw6'},{from:'tw6',to:'tw7'},{from:'tw7',to:'tw8'},
+    {from:'tw8',to:'tw9',label:'YES',kind:'yes'},
+    {from:'tw8',to:'tw8b',label:'NO',kind:'no'},
+    {from:'tw8b',to:'tw6',label:'stays in list',kind:'retry'},
+    {from:'tw9',to:'tw10'},{from:'tw10',to:'tw11'},{from:'tw11',to:'tw12'},
+    {from:'tw12',to:'tw13',label:'close',kind:'yes'},
+    {from:'tw13',to:'tw14'},
+    {from:'tw12',to:'tw15',label:'cancel',kind:'no'},
+    {from:'tw15',to:'tw16'},
+    {from:'tw10',to:'tw17',label:'external updates can arrive',kind:'info'},
+    {from:'tw17',to:'tw6',label:'updates the ticket',kind:'info'},
+    {from:'tw6',to:'tw20',label:'status model',kind:'info'},
+    {from:'tw5',to:'tw18',label:'admin area',kind:'info'},
+    {from:'tw5',to:'tw19',label:'superadmin area',kind:'info'},
+  ],
+},
 ];
 
 /* ================================================================
@@ -1009,7 +1064,7 @@ function buildScreenCards(){
   section.innerHTML = `
     <div class="section-head">
       <div class="section-head-text">
-        <h2><span class="section-num">8</span> Screen-Level Details</h2>
+        <h2><span class="section-num">9</span> Screen-Level Details</h2>
         <p>Every screen in the application, with its purpose, audience, actions and where it leads next.</p>
       </div>
       <svg class="chevron" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M6 9l6 6 6-6"/></svg>
@@ -1045,7 +1100,7 @@ function buildErrorTable(){
   section.innerHTML = `
     <div class="section-head">
       <div class="section-head-text">
-        <h2><span class="section-num">9</span> Error &amp; Exception Reference</h2>
+        <h2><span class="section-num">10</span> Error &amp; Exception Reference</h2>
         <p>Every realistic failure scenario in this portal, in plain language, with how the customer recovers.</p>
       </div>
       <svg class="chevron" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M6 9l6 6 6-6"/></svg>
@@ -1113,7 +1168,7 @@ function buildRolesModules(){
   section.innerHTML = `
     <div class="section-head">
       <div class="section-head-text">
-        <h2><span class="section-num">10</span> Roles &amp; Modules</h2>
+        <h2><span class="section-num">11</span> Roles &amp; Modules</h2>
         <p>Who uses this system, and the functional modules that make it up.</p>
       </div>
       <svg class="chevron" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M6 9l6 6 6-6"/></svg>
@@ -1203,6 +1258,7 @@ function buildNav(){
     {id:'details', label:'Status Lifecycle'},
     {id:'email', label:'Email Flow'},
     {id:'swimlane', label:'System Map'},
+    {id:'trackwise', label:'Inside DSS Tracker'},
     {id:'screens', label:'Screens'},
     {id:'errors', label:'Errors'},
     {id:'roles', label:'Roles & Modules'},
