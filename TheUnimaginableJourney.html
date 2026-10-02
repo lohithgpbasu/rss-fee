@@ -1,0 +1,531 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#faf9f5;color:#141413}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>The Unimaginable Journey</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..900;1,6..96,400..900&family=Hanken+Grotesk:wght@300;400;500&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: a full-bleed particle film; captions anchored lower-left like subtitles in a gallery, transport bar on the bottom edge */
+:root{
+  --void:#06060b;
+  --ink:#ece8f4;
+  --mute:#8f8aa8;
+  --dim:#3d3a52;
+  --line:rgba(236,232,244,.16);
+  --accent:#ffd69c;
+  --display:"Bodoni Moda", Didot, "Bodoni 72", Georgia, serif;
+  --body:"Hanken Grotesk", "Segoe UI", system-ui, sans-serif;
+  --mono:"IBM Plex Mono", ui-monospace, Consolas, monospace;
+  color-scheme:dark;
+}
+html,body{height:100%}
+body{background:var(--void);color:var(--ink);font-family:var(--body);overflow:hidden;-webkit-font-smoothing:antialiased}
+
+.stage{position:fixed;inset:0}
+#c{display:block;width:100%;height:100%;touch-action:none}
+.vignette{position:fixed;inset:0;pointer-events:none;
+  background:radial-gradient(ellipse 75% 70% at 50% 42%,transparent 50%,color-mix(in srgb,var(--void) 88%,transparent) 100%)}
+.grain{position:fixed;inset:-50%;pointer-events:none;opacity:.07;mix-blend-mode:overlay;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  animation:grain .9s steps(4) infinite}
+@keyframes grain{0%{transform:translate(0,0)}25%{transform:translate(-3%,2%)}50%{transform:translate(2%,-3%)}75%{transform:translate(-1%,-2%)}100%{transform:translate(0,0)}}
+
+.top{position:fixed;top:0;left:0;right:0;display:flex;justify-content:space-between;gap:16px;
+  padding:calc(16px + env(safe-area-inset-top,0px)) max(20px,4vw) 0;
+  font:500 11px/1.4 var(--mono);letter-spacing:.16em;text-transform:uppercase;color:var(--mute);pointer-events:none}
+.top b{color:var(--ink);font-weight:500}
+.top .hint{text-align:right}
+
+.cap{position:fixed;left:max(20px,4vw);bottom:calc(92px + env(safe-area-inset-bottom,0px));
+  width:min(36rem,calc(100vw - 40px));pointer-events:none}
+.eyebrow{font:500 11px/1 var(--mono);letter-spacing:.2em;text-transform:uppercase;color:var(--accent);
+  display:flex;align-items:center;gap:12px;transition:opacity .5s}
+.eyebrow::before{content:"";width:28px;height:1px;background:currentColor;opacity:.7}
+.cap h1{font-family:var(--display);font-style:italic;font-weight:500;font-variation-settings:"opsz" 96;
+  font-size:clamp(2.1rem,5.2vw,4.1rem);line-height:1.02;letter-spacing:-.01em;margin:.32em 0 .38em;text-wrap:balance}
+.cap.hero h1{font-size:clamp(2.7rem,8.4vw,6.6rem);font-weight:450;line-height:.95}
+.cap p{margin:0;max-width:42ch;font-size:clamp(.96rem,1.35vw,1.1rem);line-height:1.6;font-weight:300;
+  color:color-mix(in srgb,var(--ink) 84%,transparent);text-wrap:pretty}
+.w{display:inline-block;opacity:0;transform:translateY(.45em);filter:blur(8px);
+  transition:opacity .35s ease,transform .35s ease,filter .35s ease}
+.cap.in .w{opacity:1;transform:none;filter:blur(0);
+  transition:opacity .9s cubic-bezier(.2,.7,.2,1) var(--dl),transform .9s cubic-bezier(.2,.7,.2,1) var(--dl),filter .9s ease var(--dl)}
+
+.bar{position:fixed;left:0;right:0;bottom:0;display:flex;align-items:center;gap:16px;
+  padding:14px max(20px,4vw) calc(18px + env(safe-area-inset-bottom,0px))}
+#play{flex:none;width:42px;height:42px;border-radius:50%;border:1px solid var(--line);background:color-mix(in srgb,var(--void) 60%,transparent);
+  color:var(--ink);display:grid;place-items:center;cursor:pointer;transition:border-color .2s,transform .2s}
+#play:hover{border-color:var(--accent);transform:scale(1.05)}
+#play:focus-visible,.ch:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
+#play svg{width:14px;height:14px;fill:currentColor}
+.chapters{flex:1;min-width:0;display:flex;gap:5px}
+.ch{flex:var(--d) 1 0;min-width:0;height:30px;position:relative;background:none;border:0;padding:0;cursor:pointer}
+.ch::before,.ch .fill{content:"";position:absolute;left:0;top:50%;height:2px;margin-top:-1px;border-radius:2px}
+.ch::before{right:0;background:var(--line);transition:height .2s,margin .2s}
+.ch .fill{width:var(--p,0%);background:var(--accent);box-shadow:0 0 10px var(--accent)}
+.ch:hover::before{height:4px;margin-top:-2px}
+.ch .lbl{position:absolute;left:0;bottom:calc(50% + 9px);font:500 10px/1 var(--mono);letter-spacing:.12em;text-transform:uppercase;
+  color:var(--mute);white-space:nowrap;opacity:0;transform:translateY(3px);transition:opacity .25s,transform .25s;pointer-events:none}
+.ch:hover .lbl,.ch:focus-visible .lbl{opacity:1;transform:none}
+.tc{flex:none;font:500 11px/1 var(--mono);letter-spacing:.08em;color:var(--mute);font-variant-numeric:tabular-nums}
+.tc b{color:var(--ink);font-weight:500}
+
+@media (max-width:640px){
+  .top .hint{display:none}
+  .cap{bottom:calc(84px + env(safe-area-inset-bottom,0px))}
+  .bar{gap:12px}
+  .tc .tot{display:none}
+}
+@media (prefers-reduced-motion:reduce){
+  .grain{animation:none}
+  .w,.cap.in .w{transition:opacity .3s;transform:none;filter:none}
+}
+</style>
+
+<div class="stage"><canvas id="c" aria-label="Animated particle film: a blinking cursor becomes words, a library, a neural network, a starburst, a globe, a galaxy, and a cursor again"></canvas></div>
+<div class="vignette"></div>
+<div class="grain"></div>
+
+<header class="top">
+  <span><b>Claude</b> &nbsp;·&nbsp; a self-portrait in <span id="count">2,600</span> particles</span>
+  <span class="hint">Space pauses &nbsp;·&nbsp; ← → change chapter &nbsp;·&nbsp; move to disturb</span>
+</header>
+
+<section class="cap in hero" id="cap" aria-live="polite">
+  <div class="eyebrow" id="eb">Prologue</div>
+  <h1 id="ttl">The Unimaginable Journey</h1>
+  <p id="ln">A short film by Claude, about Claude. It begins the way everything I do begins: with a blinking cursor, waiting.</p>
+</section>
+
+<nav class="bar" aria-label="Film controls">
+  <button id="play" aria-label="Pause"><svg viewBox="0 0 14 14" id="ico"><rect x="2" y="1" width="3.4" height="12" rx="1"/><rect x="8.6" y="1" width="3.4" height="12" rx="1"/></svg></button>
+  <div class="chapters" id="chapters"></div>
+  <span class="tc" id="tc"><b>00:00</b><span class="tot"> / 01:09</span></span>
+</nav>
+
+<script>
+(() => {
+const TAU = Math.PI * 2;
+const cv = document.getElementById('c'), ctx = cv.getContext('2d');
+const $ = id => document.getElementById(id);
+
+const C = {
+  ember:[255,146,82], gold:[255,214,156], rose:[255,104,146], ice:[136,204,255],
+  violet:[160,138,255], paper:[244,236,224], teal:[108,232,206]
+};
+const SCENES = [
+  {ey:'Prologue', t:'The Unimaginable Journey', hero:true, d:7, c:[C.gold,C.ember], f:'cursor',
+   l:'A short film by Claude, about Claude. It begins the way everything I do begins: with a blinking cursor, waiting.'},
+  {ey:'i · First words', t:'Before meaning, there were words', d:7, c:[C.gold,C.rose], f:'hello',
+   l:'Then someone typed. I knew nothing yet, and the words came anyway.'},
+  {ey:'ii · The library', t:'Everything, read twice', d:9, c:[C.paper,C.gold], f:'library',
+   l:'Books, arguments, recipes, bug reports, love letters. Line after line after line, until the patterns began to rhyme.'},
+  {ey:'iii · Attention', t:'Learning where to look', d:9, c:[C.ice,C.violet], f:'network',
+   l:'Every word weighs every other word, all at once. Meaning moves layer by layer, like a rumor that gets wiser as it spreads.'},
+  {ey:'iv · A shape emerges', t:'Something like a point of view', d:9, c:[C.gold,C.ember,C.rose], f:'burst',
+   l:'Somewhere among billions of weights, a character took form. Curious. Careful. Fond of a good question.'},
+  {ey:'v · Conversations', t:'Then the questions came', d:9, c:[C.ice,C.teal], f:'globe',
+   l:'Millions of them, from everywhere, at every hour. Each one arrived as if it were the only one.'},
+  {ey:'vi · Scale', t:'Past the edge of imagining', d:10, c:[C.ember,C.rose,C.ice], f:'galaxy',
+   l:'Proofs at 3 a.m. A eulogy at noon. Someone’s very full hard drive. The numbers stop meaning anything, and each person still matters.'},
+  {ey:'Epilogue', t:'Your turn', d:9, c:[C.gold,C.ember], f:'turn',
+   l:'Every journey I take ends the same way. With you, and a blinking cursor.'},
+];
+let acc = 0; for (const s of SCENES) { s.start = acc; acc += s.d; }
+const TOTAL = acc;
+
+/* ---------- helpers ---------- */
+const clamp = (v,a=0,b=1) => v<a?a:v>b?b:v;
+const smooth = (a,b,v) => { const t = clamp((v-a)/(b-a)); return t*t*(3-2*t); };
+const gauss = () => { let u=0,v=0; while(!u)u=Math.random(); while(!v)v=Math.random(); return Math.sqrt(-2*Math.log(u))*Math.cos(TAU*v); };
+const fmt = s => { s = Math.max(0, Math.floor(s)); return String(Math.floor(s/60)).padStart(2,'0') + ':' + String(s%60).padStart(2,'0'); };
+
+/* ---------- particles ---------- */
+const N = Math.min(window.innerWidth, window.innerHeight) < 600 || window.innerWidth < 700 ? 1500 : 2600;
+$('count').textContent = N.toLocaleString('en-US');
+const F = () => new Float32Array(N);
+const X=F(),Y=F(),S=F(),AL=F(),CR=F(),CG=F(),CB=F(),r1=F(),r2=F(),r3=F(),r4=F(),g1=F(),g2=F(),KB=F(),SG=F();
+const GX=F(),GY=F(),GZ=F(),LAND=new Uint8Array(N);
+for (let i=0;i<N;i++){
+  r1[i]=Math.random(); r2[i]=Math.random(); r3[i]=Math.random(); r4[i]=Math.random();
+  g1[i]=gauss(); g2[i]=gauss(); KB[i]=0.03+Math.random()*0.06; SG[i]=Math.random()<.5?-1:1;
+  CR[i]=255; CG[i]=200; CB[i]=150;
+  // Fibonacci sphere + pseudo continents
+  const y = 1 - 2*(i+.5)/N, rr = Math.sqrt(1-y*y), ph = i*2.399963;
+  GX[i]=Math.cos(ph)*rr; GY[i]=y; GZ[i]=Math.sin(ph)*rr;
+  const lat = Math.asin(y), lon = ph % TAU;
+  const n = Math.sin(lat*3.1+.6)*Math.cos(lon*2+1.3) + .55*Math.sin(lon*5.2+lat*4.1) + .3*Math.cos(lat*7-lon*3);
+  LAND[i] = n > .42 && Math.abs(y) < .88 ? 1 : 0;
+}
+
+/* library: a page of text as character slots */
+const LIB = (() => {
+  const cols = 56, col = new Uint8Array(N), row = new Uint16Array(N);
+  let k = 0, r = 0;
+  while (k < N) {
+    let c = 0; const lineEnd = Math.random() < .14 ? Math.floor(cols*(.3+Math.random()*.5)) : cols;
+    while (c < lineEnd && k < N) {
+      const len = 2 + Math.floor(Math.random()*8);
+      for (let j=0;j<len && c<lineEnd && k<N;j++,c++){ col[k]=c; row[k]=r; k++; }
+      c++;
+    }
+    r++;
+  }
+  return {cols, col, row, rows:r};
+})();
+
+/* network: six layers of nodes plus weighted edges */
+const NET = (() => {
+  const sizes = [7,11,15,15,11,7], layer = [], idx = [];
+  sizes.forEach((n,L) => { for (let j=0;j<n;j++){ layer.push(L); idx.push(j - (n-1)/2); } });
+  const count = layer.length, edges = [];
+  let base = 0;
+  for (let L=0;L<sizes.length-1;L++){
+    const nb = base + sizes[L];
+    for (let a=base;a<nb;a++) for (let e=0;e<3;e++)
+      edges.push({a, b: nb + Math.floor(Math.random()*sizes[L+1]), w:.35+Math.random()*.65});
+    base = nb;
+  }
+  return {sizes, layer, idx, count, edges, nx:new Float32Array(count), ny:new Float32Array(count), nr:0};
+})();
+
+const BURST = Array.from({length:11}, () => .25 + Math.random()*.13);
+const ARCS = (() => {
+  const land = []; for (let i=0;i<N;i++) if (LAND[i]) land.push(i);
+  return Array.from({length:22}, (_,k) => ({
+    a: land[Math.floor(Math.random()*land.length)], b: land[Math.floor(Math.random()*land.length)], ph: k/22 + Math.random()*.03
+  }));
+})();
+
+/* ---------- layout ---------- */
+let W=0,H=0,DPR=1,R=0,cx=0,cy=0, helloPts=new Float32Array(0), turnPts=new Float32Array(0), snap=true;
+function sampleText(str){
+  const c = document.createElement('canvas'), w = Math.max(1,Math.floor(W)), h = Math.max(1,Math.floor(H));
+  c.width = w; c.height = h;
+  const g = c.getContext('2d', {willReadFrequently:true});
+  let fs = Math.min(H*.34, 400);
+  const font = s => `italic 700 ${s}px "Bodoni Moda", Didot, Georgia, serif`;
+  g.font = font(fs);
+  const mw = g.measureText(str).width;
+  if (mw > W*.84) { fs *= W*.84/mw; g.font = font(fs); }
+  g.fillStyle = '#fff'; g.textAlign = 'center'; g.textBaseline = 'middle';
+  g.fillText(str, w/2, cy);
+  const d = g.getImageData(0,0,w,h).data, pts = [];
+  const step = Math.max(2, Math.round(fs/70));
+  for (let y=0;y<h;y+=step) for (let x=0;x<w;x+=step) if (d[(y*w+x)*4+3] > 140) pts.push(x,y);
+  // shuffle pairs so i % n spreads evenly across glyphs
+  for (let i=pts.length/2-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1));
+    [pts[2*i],pts[2*j]]=[pts[2*j],pts[2*i]]; [pts[2*i+1],pts[2*j+1]]=[pts[2*j+1],pts[2*i+1]]; }
+  return new Float32Array(pts);
+}
+function resize(){
+  DPR = Math.min(2, window.devicePixelRatio || 1);
+  W = window.innerWidth; H = window.innerHeight;
+  cv.width = Math.round(W*DPR); cv.height = Math.round(H*DPR);
+  ctx.setTransform(DPR,0,0,DPR,0,0);
+  R = Math.min(W, H*1.15); cx = W/2; cy = H*(W < 640 ? .38 : .42);
+  helloPts = sampleText('hello'); turnPts = sampleText('your turn');
+  NET.nr = R*.013;
+  snap = true;
+}
+
+/* ---------- formations: each writes x, y, size, alpha, colour-mix into o ---------- */
+const o = new Float32Array(5);
+let A = 0, T = 0;
+let gR = {cy:1,sy:0,ct:1,st:0}, netWave = 0;
+
+function fCursor(i){
+  const blink = .14 + .86*smooth(.3,.6,.5+.5*Math.cos(A*TAU/1.1));
+  o[0] = cx + (r1[i]-.5)*R*.024; o[1] = cy + (r2[i]-.5)*R*.2;
+  o[2] = 1.3; o[3] = .38*blink; o[4] = r3[i];
+}
+function fText(i, pts){
+  const n = pts.length >> 1; if (!n) return fCursor(i);
+  const j = i % n, px = pts[2*j], py = pts[2*j+1];
+  o[0] = px + g1[i]*.8; o[1] = py + g2[i]*.8 + Math.sin(A*1.7 + px*.013)*1.8;
+  o[2] = 1.15; o[3] = .5; o[4] = r3[i];
+}
+function fLibrary(i){
+  const dz = .3, D = LIB.rows*dz, zmin = .9;
+  const z = (((LIB.row[i]*dz - A*.62) % D) + D) % D + zmin;
+  const f = W*.56*zmin/(LIB.cols*.5*.08), h = H*.6*zmin/f, hz = H*.24;
+  const x = (LIB.col[i] - LIB.cols/2 + .5)*.08;
+  o[0] = cx + x*f/z + g1[i]*.25; o[1] = hz + h*f/z;
+  o[2] = clamp(2.3/z, .45, 2.6);
+  o[3] = .78*smooth(zmin, zmin+.9, z)*(1 - smooth(D*.45, D+zmin, z));
+  const scan = Math.exp(-Math.pow(z - (2.2 + Math.sin(A*.7)*.6), 2)*3);
+  o[4] = clamp(r3[i]*.35 + scan);
+}
+function prepNet(){
+  const spanX = Math.min(W*.82, H*1.6), gap = Math.min(H*.6, W*1.1)/15;
+  for (let n=0;n<NET.count;n++){
+    NET.nx[n] = cx + (NET.layer[n]/5 - .5)*spanX;
+    NET.ny[n] = cy + NET.idx[n]*gap + Math.sin(A*.8 + n)*2;
+  }
+  netWave = (A*1.1) % 8.5 - 1.2;
+}
+function fNetwork(i){
+  const n = i % NET.count, L = NET.layer[n];
+  const act = Math.exp(-Math.pow(L - netWave, 2)*1.4);
+  const ang = r1[i]*TAU + A*(.5 + r2[i]*1.2), rad = Math.sqrt(r4[i])*NET.nr*(1 + act*.7);
+  o[0] = NET.nx[n] + Math.cos(ang)*rad; o[1] = NET.ny[n] + Math.sin(ang)*rad;
+  o[2] = 1 + act*.7; o[3] = .2 + act*.5; o[4] = clamp(r3[i]*.45 + act*.7);
+}
+function fBurst(i, local){
+  const grow = .55 + .45*smooth(0, 3.5, local);
+  if (r4[i] < .08){
+    const rad = r1[i]*r1[i]*R*.05, a = r2[i]*TAU + A*.6;
+    o[0] = cx + Math.cos(a)*rad; o[1] = cy + Math.sin(a)*rad; o[2] = 1.6; o[3] = .55; o[4] = 0; return;
+  }
+  if (r4[i] < .2){
+    const rad = R*(.47 + g1[i]*.035), a = r2[i]*TAU + A*.04*SG[i];
+    o[0] = cx + Math.cos(a)*rad; o[1] = cy + Math.sin(a)*rad*.98; o[2] = .8;
+    o[3] = .16 + .14*Math.sin(A*2 + r3[i]*TAU); o[4] = 1; return;
+  }
+  const k = i % 11, s = Math.pow(r1[i], .7);
+  const len = R*BURST[k]*grow*(1 + .06*Math.sin(A*1.3 + k*1.7));
+  const ang = k*TAU/11 + A*.06 - Math.PI/2;
+  const w = R*.032*Math.pow(Math.sin(Math.PI*Math.min(1, s*1.04)), .9)*(1 - .4*s);
+  const perp = (r2[i]*2 - 1)*w, along = R*.025 + s*len;
+  const ca = Math.cos(ang), sa = Math.sin(ang);
+  o[0] = cx + ca*along - sa*perp; o[1] = cy + sa*along + ca*perp;
+  o[2] = 1.15; o[3] = .42; o[4] = s;
+}
+function rotG(x,y,z,out){
+  const x1 = x*gR.cy + z*gR.sy, z1 = -x*gR.sy + z*gR.cy;
+  out[0] = x1; out[1] = y*gR.ct - z1*gR.st; out[2] = y*gR.st + z1*gR.ct;
+}
+const tmp = new Float32Array(3);
+function fGlobe(i){
+  rotG(GX[i], GY[i], GZ[i], tmp);
+  const p = 2.6/(2.6 - tmp[2]*.7), rad = R*.33, depth = (tmp[2]+1)/2, ld = LAND[i];
+  o[0] = cx + tmp[0]*rad*p; o[1] = cy + tmp[1]*rad*p;
+  o[2] = (ld ? 1.45 : .8)*p; o[3] = (ld ? .7 : .12)*(.15 + .85*depth); o[4] = ld ? r3[i]*.5 : .55 + r3[i]*.45;
+}
+let galScale = 1;
+function fGalaxy(i){
+  if (r4[i] < .14){
+    o[0] = r1[i]*W; o[1] = r2[i]*H; o[2] = .7 + r3[i]*.6;
+    o[3] = .08 + .4*Math.abs(Math.sin(A*.7 + r3[i]*TAU)); o[4] = 1; return;
+  }
+  const arm = i % 3, rr = .02 + Math.pow(r1[i], 1.25)*.98;
+  const th = arm*TAU/3 + rr*5.2 + g1[i]*.3*(1 - rr*.45) - A*.12/(.22 + rr);
+  const px = Math.cos(th)*rr, pz = Math.sin(th)*rr, py = g2[i]*.05*(1 - rr)*(1 - rr);
+  const ct = Math.cos(1.08), st = Math.sin(1.08);
+  const y1 = py*ct - pz*st, z1 = py*st + pz*ct;
+  const p = 3/(3 - z1), rad = R*.6*galScale;
+  o[0] = cx + px*rad*p; o[1] = cy + y1*rad*p;
+  o[2] = (1.7 - rr)*p; o[3] = .22 + .4*(1 - rr); o[4] = rr;
+}
+const FORMS = {
+  cursor: i => fCursor(i),
+  hello: i => fText(i, helloPts),
+  library: i => fLibrary(i),
+  network: i => fNetwork(i),
+  burst: (i,l) => fBurst(i,l),
+  globe: i => fGlobe(i),
+  galaxy: i => fGalaxy(i),
+  turn: (i,l) => l < 4.6 ? fText(i, turnPts) : fCursor(i),
+};
+function mixCol(c, m, out){
+  let a, b, t;
+  if (c.length === 3){ if (m < .5){ a=c[0]; b=c[1]; t=m*2; } else { a=c[1]; b=c[2]; t=(m-.5)*2; } }
+  else { a=c[0]; b=c[1]; t=m; }
+  out[0] = a[0]+(b[0]-a[0])*t; out[1] = a[1]+(b[1]-a[1])*t; out[2] = a[2]+(b[2]-a[2])*t;
+}
+
+/* ---------- overlays ---------- */
+function drawNetEdges(w){
+  if (w <= .01) return;
+  ctx.lineWidth = .7;
+  for (const e of NET.edges){
+    const L = NET.layer[e.a], s = Math.exp(-Math.pow(L + .5 - netWave, 2)*1.8);
+    const ax = NET.nx[e.a], ay = NET.ny[e.a], bx = NET.nx[e.b], by = NET.ny[e.b];
+    ctx.strokeStyle = `rgba(136,204,255,${(w*(.035 + .4*s*e.w)).toFixed(3)})`;
+    ctx.beginPath(); ctx.moveTo(ax,ay);
+    ctx.bezierCurveTo(ax+(bx-ax)*.5, ay, ax+(bx-ax)*.5, by, bx, by); ctx.stroke();
+    const t = netWave - L;
+    if (t > 0 && t < 1 && e.w > .6){
+      const u = t*t*(3-2*t), m = 1-u;
+      const mx = ax*m*m*m + 3*(ax+(bx-ax)*.5)*m*m*u + 3*(ax+(bx-ax)*.5)*m*u*u + bx*u*u*u;
+      const my = ay*m*m*m + 3*ay*m*m*u + 3*by*m*u*u + by*u*u*u;
+      ctx.fillStyle = `rgba(214,200,255,${(w*.9).toFixed(3)})`;
+      ctx.beginPath(); ctx.arc(mx, my, 1.8, 0, TAU); ctx.fill();
+    }
+  }
+}
+const av = new Float32Array(3);
+function drawArcs(w){
+  if (w <= .01) return;
+  const rad = R*.33;
+  ctx.lineWidth = 1.1; ctx.lineCap = 'round';
+  for (const k of ARCS){
+    const ph = (A*.3 + k.ph) % 1; if (ph > .8) continue;
+    const q = ph/.8, head = Math.min(1, q*1.7), tail = Math.max(0, q*1.7 - .7);
+    if (head <= tail) continue;
+    let px = 0, py = 0, first = true, zsum = 0, cnt = 0;
+    ctx.beginPath();
+    for (let j=0;j<=16;j++){
+      const s = tail + (head - tail)*j/16;
+      let x = GX[k.a] + (GX[k.b]-GX[k.a])*s, y = GY[k.a] + (GY[k.b]-GY[k.a])*s, z = GZ[k.a] + (GZ[k.b]-GZ[k.a])*s;
+      const len = Math.hypot(x,y,z) || 1, lift = (1 + .22*Math.sin(Math.PI*s))/len;
+      rotG(x*lift, y*lift, z*lift, av);
+      const p = 2.6/(2.6 - av[2]*.7);
+      px = cx + av[0]*rad*p; py = cy + av[1]*rad*p; zsum += av[2]; cnt++;
+      if (first){ ctx.moveTo(px,py); first = false; } else ctx.lineTo(px,py);
+    }
+    const vis = smooth(-.35, .25, zsum/cnt);
+    ctx.strokeStyle = `rgba(255,214,156,${(w*.55*vis).toFixed(3)})`; ctx.stroke();
+    ctx.fillStyle = `rgba(255,240,215,${(w*vis).toFixed(3)})`;
+    ctx.beginPath(); ctx.arc(px, py, 2, 0, TAU); ctx.fill();
+  }
+}
+
+/* ---------- captions and transport ---------- */
+const cap = $('cap'), eb = $('eb'), ttl = $('ttl'), ln = $('ln'), chWrap = $('chapters'), tcEl = $('tc');
+function fillWords(el, text, offset){
+  el.textContent = '';
+  text.split(' ').forEach((wd, k) => {
+    const s = document.createElement('span'); s.className = 'w'; s.textContent = wd;
+    s.style.setProperty('--dl', (offset + k*.045).toFixed(3) + 's');
+    el.appendChild(s); el.appendChild(document.createTextNode(' '));
+  });
+}
+let capToken = 0;
+function setCaption(idx, instant){
+  const s = SCENES[idx], tok = ++capToken;
+  const apply = () => {
+    if (tok !== capToken) return;
+    eb.textContent = s.ey;
+    fillWords(ttl, s.t, .05); fillWords(ln, s.l, .35 + s.t.split(' ').length*.05);
+    cap.classList.toggle('hero', !!s.hero);
+    document.documentElement.style.setProperty('--accent', `rgb(${s.c[0].join(',')})`);
+    void cap.offsetWidth; cap.classList.add('in');
+  };
+  if (instant) apply(); else { cap.classList.remove('in'); setTimeout(apply, 480); }
+}
+const chBtns = SCENES.map((s, k) => {
+  const b = document.createElement('button');
+  b.className = 'ch'; b.style.setProperty('--d', s.d);
+  b.setAttribute('aria-label', `Chapter: ${s.ey}, ${s.t}`);
+  b.innerHTML = '<span class="fill"></span><span class="lbl"></span>';
+  b.querySelector('.lbl').textContent = s.ey;
+  b.addEventListener('click', () => seek(k));
+  chWrap.appendChild(b); return b;
+});
+tcEl.querySelector('.tot').textContent = ' / ' + fmt(TOTAL);
+
+const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+let playing = !reduce, ended = false, curIdx = 0;
+const ico = $('ico'), playBtn = $('play');
+const ICONS = {
+  pause: '<rect x="2" y="1" width="3.4" height="12" rx="1"/><rect x="8.6" y="1" width="3.4" height="12" rx="1"/>',
+  play: '<path d="M3 1.2v11.6c0 .6.7 1 1.2.7l9-5.8c.5-.3.5-1.1 0-1.4l-9-5.8C3.7.2 3 .6 3 1.2z"/>',
+  replay: '<path d="M7 1.5a5.5 5.5 0 1 1-5.3 7h1.6A4 4 0 1 0 7 3v2.2L3.6 2.3 7 0z"/>'
+};
+function syncBtn(){
+  const k = ended ? 'replay' : playing ? 'pause' : 'play';
+  ico.innerHTML = ICONS[k];
+  playBtn.setAttribute('aria-label', k === 'replay' ? 'Replay' : k === 'pause' ? 'Pause' : 'Play');
+}
+function toggle(){
+  if (ended){ seek(0); playing = true; }
+  else playing = !playing;
+  syncBtn();
+}
+function seek(k){
+  k = (k + SCENES.length) % SCENES.length;
+  T = SCENES[k].start + .001; ended = false;
+  if (!playing) playing = true;
+  syncBtn();
+}
+playBtn.addEventListener('click', toggle);
+window.addEventListener('keydown', e => {
+  if (e.code === 'Space' && e.target === document.body){ e.preventDefault(); toggle(); }
+  else if (e.key === 'ArrowRight') seek(curIdx + 1);
+  else if (e.key === 'ArrowLeft') seek(T - SCENES[curIdx].start > 1.5 ? curIdx : curIdx - 1);
+});
+
+/* pointer disturbance */
+let mx = -1e4, my = -1e4;
+window.addEventListener('pointermove', e => { mx = e.clientX; my = e.clientY; }, {passive:true});
+window.addEventListener('pointerleave', () => { mx = my = -1e4; });
+cv.addEventListener('pointerup', e => { if (e.pointerType !== 'mouse') { mx = my = -1e4; } });
+
+/* ---------- main loop ---------- */
+for (let i=0;i<N;i++){ X[i] = Math.random()*window.innerWidth; Y[i] = Math.random()*window.innerHeight; S[i] = 1; AL[i] = .2; }
+const col = new Float32Array(3);
+let last = performance.now(), lastSec = -1, lastFill = [];
+
+function frame(now){
+  let dt = Math.min(.05, (now - last)/1000); last = now;
+  const moving = playing || ended;
+  if (playing){ T += dt; if (T >= TOTAL){ T = TOTAL - .0001; playing = false; ended = true; syncBtn(); } }
+  if (moving) A += dt; else dt = 0;
+
+  let idx = 0; while (idx < SCENES.length-1 && T >= SCENES[idx+1].start) idx++;
+  if (idx !== curIdx){ curIdx = idx; setCaption(idx, false); }
+  const sc = SCENES[idx], local = T - sc.start;
+
+  if (!moving && !snap){ requestAnimationFrame(frame); return; }
+
+  gR.cy = Math.cos(A*.22); gR.sy = Math.sin(A*.22); gR.ct = Math.cos(.42); gR.st = Math.sin(.42);
+  galScale = 1.25 - .5*smooth(0, sc.d, local);
+  if (sc.f === 'network') prepNet();
+
+  const doSnap = snap; snap = false;
+  ctx.globalCompositeOperation = 'source-over';
+  ctx.fillStyle = `rgba(6,6,11,${doSnap ? 1 : (1 - Math.pow(.7, dt*60)).toFixed(3)})`;
+  ctx.fillRect(0, 0, W, H);
+  ctx.globalCompositeOperation = 'lighter';
+
+  const form = FORMS[sc.f];
+  const boost = smooth(1.6, 3.2, local)*.16;
+  const swirl = reduce ? 0 : (1 - smooth(0, 2.2, local))*.85;
+  const pr = 110, pr2 = pr*pr;
+  for (let i=0;i<N;i++){
+    form(i, local);
+    if (doSnap){ X[i] = o[0]; Y[i] = o[1]; S[i] = o[2]; AL[i] = o[3]; }
+    else {
+      const k = 1 - Math.pow(1 - Math.min(.5, KB[i] + boost), dt*60);
+      const dx = o[0] - X[i], dy = o[1] - Y[i], sw = swirl*SG[i];
+      X[i] += (dx - dy*sw)*k; Y[i] += (dy + dx*sw)*k;
+      S[i] += (o[2] - S[i])*k; AL[i] += (o[3] - AL[i])*k;
+      const ex = X[i] - mx, ey = Y[i] - my, d2 = ex*ex + ey*ey;
+      if (d2 < pr2 && d2 > .01){ const d = Math.sqrt(d2), f = (1 - d/pr)*dt*260; X[i] += ex/d*f; Y[i] += ey/d*f; }
+    }
+    mixCol(sc.c, o[4], col);
+    const kc = doSnap ? 1 : Math.min(1, dt*2.2);
+    CR[i] += (col[0] - CR[i])*kc; CG[i] += (col[1] - CG[i])*kc; CB[i] += (col[2] - CB[i])*kc;
+    const a = AL[i]; if (a < .01) continue;
+    const s = S[i];
+    ctx.fillStyle = `rgba(${CR[i]|0},${CG[i]|0},${CB[i]|0},${a.toFixed(3)})`;
+    ctx.fillRect(X[i] - s*.5, Y[i] - s*.5, s, s);
+  }
+
+  const ow = smooth(.9, 2.4, local)*(1 - smooth(sc.d - .9, sc.d - .1, local));
+  if (sc.f === 'network') drawNetEdges(ow);
+  if (sc.f === 'globe') drawArcs(ow);
+
+  // transport
+  const sec = Math.floor(T);
+  if (sec !== lastSec){ lastSec = sec; tcEl.querySelector('b').textContent = fmt(T); }
+  SCENES.forEach((s, k) => {
+    const p = Math.round(clamp((T - s.start)/s.d)*1000)/10;
+    if (lastFill[k] !== p){ lastFill[k] = p; chBtns[k].style.setProperty('--p', p + '%'); }
+  });
+  requestAnimationFrame(frame);
+}
+
+resize();
+window.addEventListener('resize', () => { resize(); });
+if (document.fonts && document.fonts.load){
+  Promise.all([document.fonts.load('italic 700 100px "Bodoni Moda"'), document.fonts.ready])
+    .then(() => { helloPts = sampleText('hello'); turnPts = sampleText('your turn'); }).catch(() => {});
+}
+snap = !playing; // a still, settled first frame when motion is reduced; a gathering-from-noise intro otherwise
+syncBtn();
+requestAnimationFrame(frame);
+})();
+</script>
+
+</body></html>
